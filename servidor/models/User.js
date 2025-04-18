@@ -1,3 +1,4 @@
+const { DataTypes } = require("sequelize");
 const bcrypt = require('bcrypt');
 
 module.exports = (sequelize, DataTypes) => {
@@ -35,16 +36,9 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
 
-    User.associate = function(models) {
-        User.hasOne(models.ClientProfile, {
-            foreignKey: 'userId',
-            as: 'clientProfile'
-        });
-    };
-
     User.prototype.validPassword = async function (password) {
         return await bcrypt.compare(password, this.password);
     }
 
-    return User;
+    return usuarios
 };
