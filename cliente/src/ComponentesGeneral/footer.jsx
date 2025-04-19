@@ -7,8 +7,8 @@ function Pie(){
         <>
         <footer>
             <ul className='primerfooter'>
-                <li id="LaTienditaDelAbuelo"><strong>LA TIENDITA DEL ABUELO</strong></li>
-                <li>© 2010 - 2020</li>
+                <li id="LaboraPe"><strong>LaboraPe</strong></li>
+                <li>© 2025 - 2030</li>
                 <li>Privacy - Terms</li>
 
             </ul>

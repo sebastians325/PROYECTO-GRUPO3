@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/LandingPage" element={<LandingPage />} />
+        <Route path="/" element={<LandingPage />} />
       </Routes>
     </div>
   );
