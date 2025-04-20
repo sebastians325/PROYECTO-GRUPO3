@@ -10,6 +10,7 @@ function PaginaProductoPrincipal() {
 
     return (
         <>
+            
             <Pie />
         </>
     );

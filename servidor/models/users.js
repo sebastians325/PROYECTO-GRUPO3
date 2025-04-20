@@ -26,7 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         role: {
             type: DataTypes.ENUM('freelancer', 'cliente'),
             allowNull: false
-        }
+        },
+        especialidad: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
     }, {
         hooks: {
             beforeCreate: async (user) => {
