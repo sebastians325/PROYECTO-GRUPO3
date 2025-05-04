@@ -7,8 +7,15 @@ app.use(express.json())
 app.use(cors())
 
 //Rutas
-const postRouter = require('./routes/usuarios')
-app.use("/usuarios", postRouter);
+const usuariosRouter = require('./routes/usuarios')
+app.use("/usuarios", usuariosRouter);
+
+const publicacionesRouter = require('./routes/publicaciones');
+app.use("/publicaciones", publicacionesRouter);
+
+const postulacionesRouter = require('./routes/postulaciones');
+app.use("/postulaciones", postulacionesRouter);
+
 
 db.sequelize.sync().then(() => {
 
