@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { usuarios } = require("../models");
+const jwt = require("jsonwebtoken");
 
 // API GET
 router.get("/", async (req, res) => {
@@ -97,6 +98,49 @@ router.post("/register/cliente", async (req, res) => {
              return res.status(400).json({ error: "Datos inválidos.", details: error.errors.map(e => e.message) });
         }
         res.status(500).json({ error: "Ocurrió un error interno al crear el usuario cliente." }); // Mensaje específico
+    }
+});
+
+// Login - autenticación de usuario
+router.post("/login", async (req, res) => {
+    const { correo, password } = req.body;
+
+    if (!correo || !password) {
+        return res.status(400).json({ error: "Correo y contraseña son requeridos." });
+    }
+
+    try {
+        const user = await usuarios.findOne({ where: { correo } });
+
+        if (!user) {
+            return res.status(401).json({ error: "Usuario no encontrado." });
+        }
+
+        const isPasswordValid = await user.validPassword(password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Contraseña incorrecta." });
+        }
+
+        // Generar token JWT
+        const token = jwt.sign(
+            {
+                id: user.id,
+                role: user.role,
+                correo: user.correo,
+                nombre: user.nombre,
+            },
+            "clave_secreta_123", // 🔐 Reemplaza esto con una clave secreta más segura (usa .env en producción)
+            { expiresIn: "1d" }
+        );
+
+        const userData = user.toJSON();
+        delete userData.password;
+
+        res.json({ mensaje: "Login exitoso", token, user: userData });
+
+    } catch (error) {
+        console.error("Error en login:", error);
+        res.status(500).json({ error: "Error en el servidor al hacer login." });
     }
 });
 module.exports = router;
