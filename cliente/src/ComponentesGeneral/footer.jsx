@@ -1,5 +1,6 @@
 import React from "react"
 import '../App.css'
+import { Link } from 'react-router-dom';
 
 function Pie(){
 
@@ -14,8 +15,9 @@ function Pie(){
             </ul>
             <ul className='segundofooter'>
                 <li id="Segundotitle"><strong>Cuenta</strong></li>
-                <li>Login</li>
-                <li>Registro</li>
+                <li><Link to="/publicaciones/login">Login</Link></li>
+                <li><Link to="/register/cliente">Registro</Link></li>
+                <Link to="/register/freelancer">Registro Freelancer</Link>
                 <li>Carrito</li>
 
             </ul>
