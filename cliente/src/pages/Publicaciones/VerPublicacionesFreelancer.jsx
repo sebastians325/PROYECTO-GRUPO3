@@ -1,50 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import Pie from '../../ComponentesGeneral/footer';
 
-const VerPublicacionesFreelancer = () => {
-    const [publicaciones, setPublicaciones] = useState([]);
+const VerPublicacionesFreelancer = ({ usuarioId }) => {
+  const [publicaciones, setPublicaciones] = useState([]);
 
-    useEffect(() => {
-        const fetchPublicaciones = async () => {
-            try {
-                const response = await fetch('http://localhost:3001/publicaciones');
-                const data = await response.json();
-                
-                if (response.ok) {
-                    setPublicaciones(data);
-                } else {
-                    alert('No se pudieron cargar las publicaciones.');
-                }
-            } catch (error) {
-                alert('Error al obtener publicaciones.');
-                console.error(error);
-            }
-        };
+  useEffect(() => {
+    const fetchPublicaciones = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/publicaciones');
+        const data = await response.json();
+        setPublicaciones(data);
+      } catch (error) {
+        console.error('Error al obtener publicaciones:', error);
+      }
+    };
+    fetchPublicaciones();
+  }, []);
 
-        fetchPublicaciones();
-    }, []);
+  const handlePostular = async (publicacionId) => {
+    try {
+      const response = await fetch('http://localhost:3001/postulaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuarioId, publicacionId }),
+      });
 
-    return (
-        <div>
-            <h2>Publicaciones Disponibles</h2>
-            {publicaciones.length === 0 ? (
-                <p>No hay publicaciones disponibles en este momento.</p>
-            ) : (
-                <ul>
-                    {publicaciones.map(pub => (
-                        <li key={pub.id}>
-                            <strong>{pub.titulo}</strong> <br />
-                            {pub.descripcion} <br />
-                            <strong>Cliente:</strong> {pub.cliente?.nombre} {pub.cliente?.apellido} <br />
-                            <strong>Ubicación:</strong> {pub.ubicacion} <br />
-                            <strong>Salario:</strong> ${pub.salario}
-                        </li>
-                    ))}
-                </ul>
-            )}
-            <Pie />
+      if (!response.ok) {
+        throw new Error('Error al postularse');
+      }
+
+      alert('Postulación realizada exitosamente');
+    } catch (error) {
+      alert('Error al postularse: ' + error.message);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Publicaciones Disponibles</h2>
+      {publicaciones.map((pub) => (
+        <div key={pub.id} style={{ border: '1px solid gray', margin: '10px', padding: '10px' }}>
+          <h3>{pub.titulo}</h3>
+          <p>{pub.descripcion}</p>
+          <p>Estado: {pub.estado}</p>
+          <p>Publicado por: {pub.cliente?.nombre} {pub.cliente?.apellido}</p>
+          <button
+            onClick={() => handlePostular(pub.id)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Postularme
+          </button>
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
 export default VerPublicacionesFreelancer;

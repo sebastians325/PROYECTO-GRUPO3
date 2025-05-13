@@ -1,96 +1,104 @@
-import React, { useState } from 'react'; 
-import Pie from '../../ComponentesGeneral/footer';
+import React, { useState } from 'react';
 
 const CrearPublicacionCliente = () => {
-    // --- ESTADO (SIN especialidad, SIN role, SIN bio) ---
-    const [formData, setFormData] = useState({
-        nombre: '',
-        descripcion: '',
-        salario: '',
-        ubicacion: '',
+  const [formData, setFormData] = useState({
+    titulo: '',
+    descripcion: '',
+    pago: '', // Aquí agregamos el campo pago
+  });
+
+  const [mensaje, setMensaje] = useState('');
+  const [error, setError] = useState('');
+
+  // ⚠️ Reemplaza esto con el ID del cliente autenticado (puede venir de contexto o login)
+  const usuarioId = 1;
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
+    setMensaje('');
+    setError('');
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const createPublication = async (publicationData) => {
-        try {
-            // --- URL APUNTANDO A LA NUEVA RUTA DE CREACIÓN DE PUBLICACIÓN ---
-            const response = await fetch('http://localhost:3001/publicaciones/crear', { // <-- Nueva URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(publicationData),
-            });
+    if (!formData.titulo || !formData.descripcion || !formData.pago) {
+      setError('Completa todos los campos.');
+      return;
+    }
 
-            const responseData = await response.json();
+    try {
+      const response = await fetch('http://localhost:3001/publicaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, usuarioId }),
+      });
 
-            if (!response.ok) {
-                const errorMessage = responseData.error || `HTTP error! status: ${response.status}`;
-                const errorDetails = responseData.details ? `\nDetalles: ${JSON.stringify(responseData.details)}` : '';
-                alert(`Error: ${errorMessage}${errorDetails}`);
-                console.error('Error data from server:', responseData);
-                return;
-            }
+      if (!response.ok) {
+        const resData = await response.json();
+        throw new Error(resData.error || 'Error al crear publicación');
+      }
 
-            alert('Publicación creada exitosamente!'); // Mensaje específico
-            console.log('Created publication:', responseData);
-            setFormData({ // Limpiar formulario
-                nombre: '', descripcion: '', salario: '', ubicacion: ''
-            });
+      setFormData({ titulo: '', descripcion: '', pago: '' });
+      setMensaje('Publicación creada exitosamente.');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-        } catch (error) {
-            console.error('Error creating publication:', error); // Mensaje específico
-            if (error instanceof SyntaxError) {
-                 alert('Ocurrió un error al procesar la respuesta del servidor.');
-            } else {
-                 alert('Ocurrió un error de red al intentar crear la publicación.');
-            }
-        }
-    };
+  return (
+    <div className="max-w-md mx-auto mt-8 p-6 border rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Crear Publicación</h2>
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // --- VALIDACIÓN (Faltan campos requeridos) ---
-        if (!formData.nombre || !formData.descripcion || !formData.salario || !formData.ubicacion) {
-             alert('Faltan campos requeridos (nombre, descripción, salario, ubicación).'); // Mensaje específico
-             return;
-        }
-
-        console.log('Form data to be sent:', formData);
-        createPublication(formData);
-    };
-
-    // --- JSX (Formulario para crear publicación) ---
-    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-            <h2>Crear Publicación</h2> {/* Título específico */}
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nombre de la Publicación:</label>
-                    <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Descripción:</label>
-                    <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Salario:</label>
-                    <input type="number" name="salario" value={formData.salario} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Ubicación:</label>
-                    <input type="text" name="ubicacion" value={formData.ubicacion} onChange={handleChange} required />
-                </div>
-                <button type="submit">Crear Publicación</button> {/* Texto botón específico */}
-            </form>
-            <Pie />
+          <label className="block font-semibold">Título:</label>
+          <input
+            type="text"
+            name="titulo"
+            value={formData.titulo}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
         </div>
-    );
+
+        <div>
+          <label className="block font-semibold">Descripción:</label>
+          <textarea
+            name="descripcion"
+            value={formData.descripcion}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+            rows={4}
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold">Pago:</label>
+          <input
+            type="number"
+            name="pago"
+            value={formData.pago}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Crear
+        </button>
+
+        {mensaje && <p className="text-green-600">{mensaje}</p>}
+        {error && <p className="text-red-600">{error}</p>}
+      </form>
+    </div>
+  );
 };
 
 export default CrearPublicacionCliente;
