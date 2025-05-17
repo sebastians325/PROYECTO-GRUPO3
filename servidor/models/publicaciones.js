@@ -11,7 +11,11 @@ module.exports = (sequelize, DataTypes) => {
         estado: {
             type: DataTypes.ENUM('abierto', 'en_proceso', 'cerrado'),
             defaultValue: 'abierto'
-        }
+        },
+        pago: {
+             type: DataTypes.FLOAT, // o DECIMAL, según tu caso
+            allowNull: false,
+        },    
     });
 
     publicaciones.associate = (models) => {
