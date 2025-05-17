@@ -1,6 +1,5 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
-
 import LandingPage from './PaginasUsuario/LandingPage';
 import ConfirmationPage from './pages/PaginaConfirmación/ConfirmationPage';
 import RegisterPageCliente from './pages/PaginaRegistroCliente/RegisterPage2';
@@ -11,6 +10,7 @@ import LoginPage1 from './pages/Publicaciones/LoginPage1';
 import DashboardCliente from './pages/Publicaciones/DashboardCliente';
 import DashboardFreelancer from './pages/Publicaciones/DashboardFreelancer'; // <--- IMPORTACIÓN AÑADIDA
 
+
 function App() {
   return (
     <div className="App">
@@ -19,7 +19,7 @@ function App() {
         <Route path="/register/cliente" element={<RegisterPageCliente />} />
         <Route path="/register/freelancer" element={<RegisterPageFreelancer />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
-        <Route path="/publicaciones/crear" element={<CrearPublicacionCliente />} />
+        <Route path="/publicaciones/crear/:id" element={<CrearPublicacionCliente />} />
         <Route path="/publicaciones/ver" element={<VerPublicacionesFreelancer />} />
         <Route path="/publicaciones/login" element={<LoginPage1 />} />
         <Route path="/dashboard/cliente/:id" element={<DashboardCliente />} />

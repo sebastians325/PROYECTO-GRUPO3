@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+//import { useParams } from 'react-router-dom';
 
 const CrearPublicacionCliente = () => {
   const [formData, setFormData] = useState({
@@ -11,8 +12,12 @@ const CrearPublicacionCliente = () => {
   const [error, setError] = useState('');
 
   // ⚠️ Reemplaza esto con el ID del cliente autenticado (puede venir de contexto o login)
-  const usuarioId = 1;
-
+  //const usuarioId = 3;
+  //const { id } = useParams(); // Id del cliente desde la URL
+  //const { id } = useParams(); // usuarioId dinámico
+  //const usuarioId = parseInt(id, 10);
+  const userStored = JSON.parse(localStorage.getItem('user'));
+  const usuarioId = userStored?.id;
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -34,7 +39,11 @@ const CrearPublicacionCliente = () => {
       const response = await fetch('http://localhost:3001/publicaciones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, usuarioId }),
+        body: JSON.stringify({ 
+          ...formData, 
+          pago: parseFloat(formData.pago), // ✅ Conversión segura a número
+          usuarioId 
+        }),
       });
 
       if (!response.ok) {

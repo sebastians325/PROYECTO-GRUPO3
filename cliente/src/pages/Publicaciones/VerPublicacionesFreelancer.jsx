@@ -42,7 +42,8 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
           <h3>{pub.titulo}</h3>
           <p>{pub.descripcion}</p>
           <p>Estado: {pub.estado}</p>
-          <p>Publicado por: {pub.cliente?.nombre} {pub.cliente?.apellido}</p>
+          <p>Pago: {pub.pago}</p>
+          <p>Publicado por: {pub.cliente?.nombre} {pub.cliente?.apellido}</p>         
           <button
             onClick={() => handlePostular(pub.id)}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
