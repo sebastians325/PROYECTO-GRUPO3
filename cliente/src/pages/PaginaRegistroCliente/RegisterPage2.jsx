@@ -1,3 +1,5 @@
+// src/Pages/RegisterPageCliente/RegisterPageCliente.js (o como lo llames)
+
 import React, { useState } from 'react';
 import './RegisterPage2.css'; // Asegúrate que la ruta sea correcta
 import Pie from '../../ComponentesGeneral/footer';

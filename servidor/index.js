@@ -1,4 +1,4 @@
-const express = require('express') 
+const express = require('express')
 const app = express()
 const cors = require('cors')
 
@@ -15,9 +15,6 @@ app.use("/publicaciones", publicacionesRouter);
 
 const postulacionesRouter = require('./routes/postulaciones');
 app.use("/postulaciones", postulacionesRouter);
-
-const mensajesRouter = require('./routes/mensajes');
-app.use("/mensajes", mensajesRouter);
 
 
 db.sequelize.sync().then(() => {
