@@ -31,7 +31,6 @@ const DashboardFreelancer = () => {
         Ver Publicaciones Disponibles
       </button>
       <button onClick={logout}>Cerrar sesión</button>
-      <Pie />
     </div>
   );
 };

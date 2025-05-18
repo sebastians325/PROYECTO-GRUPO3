@@ -10,10 +10,12 @@ import LoginPage1 from './pages/Publicaciones/LoginPage1';
 import DashboardCliente from './pages/Publicaciones/DashboardCliente';
 import DashboardFreelancer from './pages/Publicaciones/DashboardFreelancer'; // <--- IMPORTACIÓN AÑADIDA
 import PostularseComoFreelancer from './pages/Publicaciones/PostularseComoFreelancer';
+import Pie from './ComponentesGeneral/footer';
 
 function App() {
   return (
     <div className="App">
+      <main>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/register/cliente" element={<RegisterPageCliente />} />
@@ -25,8 +27,9 @@ function App() {
         <Route path="/dashboard/cliente/:id" element={<DashboardCliente />} />
         <Route path="/dashboard/freelancer/:id" element={<DashboardFreelancer />} /> {/* NUEVA RUTA */}
         <Route path="/postulaciones" element={<PostularseComoFreelancer />} />
-       
       </Routes>
+    </main>
+      <Pie />
     </div>
   );
 }

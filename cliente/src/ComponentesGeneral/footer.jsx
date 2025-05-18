@@ -7,13 +7,13 @@ function Pie(){
     return(
         <>
         <footer>
-            <ul className='primerfooter'>
+            <ul className='footer'>
                 <li id="LaboraPe"><strong>LaboraPe</strong></li>
                 <li>© 2025 - 2030</li>
                 <li>Privacy - Terms</li>
 
             </ul>
-            <ul className='segundofooter'>
+            <ul className='footer'>
                 <li id="Segundotitle"><strong>Cuenta</strong></li>
                 <li><Link to="/publicaciones/login">Login</Link></li>
                 <li><Link to="/register/cliente">Registro</Link></li>
@@ -21,14 +21,14 @@ function Pie(){
                 <li>Carrito</li>
 
             </ul>
-            <ul className='tercerofooter'>
+            <ul className='footer'>
                 <li id="tercerotitle"><strong>Productos</strong></li>
                 <li>Mas vendidos</li>
                 <li>Nuevos</li>
                 <li>Ofertas</li>
 
             </ul>
-            <ul className='cuartofooter'>
+            <ul className='footer'>
                 <li id="cuartotitle"><strong>Ayuda</strong></li>
                 <li> Acerca de Nosotros</li>
                 <li> Politica de Envio</li>
