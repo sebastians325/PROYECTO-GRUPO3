@@ -38,7 +38,7 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
     <div>
       <h2>Publicaciones Disponibles</h2>
       {publicaciones.map((pub) => (
-        <div key={pub.id} style={{ border: '1px solid gray', margin: '10px', padding: '10px' }}>
+        <div key={pub.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
           <h3>{pub.titulo}</h3>
           <p>{pub.descripcion}</p>
           <p>Estado: {pub.estado}</p>
@@ -46,7 +46,7 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
           <p>Publicado por: {pub.cliente?.nombre} {pub.cliente?.apellido}</p>         
           <button
             onClick={() => handlePostular(pub.id)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-black px-4 py-2 rounded hover:bg-blue-700"
           >
             Postularme
           </button>
