@@ -7,6 +7,7 @@ import LandingPage from './PaginasUsuario/LandingPage';
 import ConfirmationPage from './pages/PaginaConfirmación/ConfirmationPage';
 import RegisterPageCliente from './pages/PaginaRegistroCliente/RegisterPage2';
 import RegisterPageFreelancer from './pages/PaginaRegistroFreelancer/RegisterPage';
+import CrearPublicacionCliente from './pages/Publicaciones/CrearPublicacionCliente';
 function App() {
 
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register/cliente" element={<RegisterPageCliente />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/register/freelancer" element={<RegisterPageFreelancer />} />
+        <Route path="/crearPublicacion" element={<CrearPublicacionCliente />} />
        
       </Routes>
     </div>
