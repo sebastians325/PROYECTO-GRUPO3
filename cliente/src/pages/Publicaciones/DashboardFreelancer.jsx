@@ -27,7 +27,7 @@ const DashboardFreelancer = () => {
       <h2>Bienvenido, {user?.nombre}</h2>
       <p>Tu ID: {id}</p>
       <p>Este es tu panel de freelancer.</p>
-      <button onClick={() => navigate('/publicaciones/ver')}>
+      <button onClick={() => navigate(`/publicaciones/ver/${user?.id}`)}>
         Ver Publicaciones Disponibles
       </button>
       <button onClick={logout}>Cerrar sesión</button>

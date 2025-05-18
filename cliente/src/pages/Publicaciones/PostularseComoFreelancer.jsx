@@ -5,7 +5,9 @@ const PostularseComoFreelancer = ({ publicacionId }) => {
   const [error, setError] = useState('');
 
   // ⚠️ Reemplaza esto con el ID del freelancer autenticado (puede venir de contexto o token)
-  const usuarioId = 1;
+  //const usuarioId = 1;
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  const usuarioId = storedUser?.id;
 
   const handlePostular = async () => {
     try {
