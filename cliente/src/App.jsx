@@ -18,6 +18,13 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register/cliente" element={<RegisterPageCliente />} />
         <Route path="/register/freelancer" element={<RegisterPageFreelancer />} />
+        <Route path="/confirmation" element={<ConfirmationPage />} />
+        <Route path="/publicaciones/crear/:id" element={<CrearPublicacionCliente />} />
+        <Route path="/publicaciones/ver/:id" element={<VerPublicacionesFreelancer />} />
+        <Route path="/publicaciones/login" element={<LoginPage1 />} />
+        <Route path="/dashboard/cliente/:id" element={<DashboardCliente />} />
+        <Route path="/dashboard/freelancer/:id" element={<DashboardFreelancer />} /> {/* NUEVA RUTA */}
+        <Route path="/postulaciones" element={<PostularseComoFreelancer />} />
        
       </Routes>
     </div>
