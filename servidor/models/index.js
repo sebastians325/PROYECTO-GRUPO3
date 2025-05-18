@@ -1,43 +1,38 @@
-'use strict';
+const express = require('express');
+const db = require('./models'); 
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
-const process = require('process');
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
-const db = {};
+app.use(express.json());
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
-}
+app.use('/api', require('./routes/rutaEjemplo'));
 
-fs
-  .readdirSync(__dirname)
-  .filter(file => {
-    return (
-      file.indexOf('.') !== 0 &&
-      file !== basename &&
-      file.slice(-3) === '.js' &&
-      file.indexOf('.test.js') === -1
-    );
-  })
-  .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-    db[model.name] = model;
-  });
+const initializeDatabase = async () => {
+  try {
 
-Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
+    await db.sequelize.authenticate();
+    console.log('Conexión a la base de datos establecida.');
+
+    // Sincronizar modelos
+    await db.sequelize.sync({
+      force: false,   
+      alter: process.env.NODE_ENV === 'development' 
+    });
+    
+    console.log('Modelos sincronizados con la base de datos.');
+  } catch (error) {
+    console.error('Error al inicializar la base de datos:', error);
+    process.exit(1);
   }
-});
+};
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+// Iniciar servidor
+const startServer = async () => {
+  await initializeDatabase();
+  
+  app.listen(PORT, () => {
+    console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+  });
+};
 
-module.exports = db;
+startServer();
