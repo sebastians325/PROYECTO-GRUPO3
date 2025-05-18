@@ -1,11 +1,18 @@
 module.exports = (sequelize, DataTypes) => {
-  const postulaciones = sequelize.define("postulaciones", {
-    estado: {
-      type: DataTypes.ENUM('pendiente', 'aceptado', 'rechazado'),
-      defaultValue: 'pendiente'
-    },
+const postulaciones = sequelize.define("postulaciones", {
+  estado: {
+    type: DataTypes.ENUM('pendiente', 'aceptado', 'rechazado'),
+    defaultValue: 'pendiente'
+  }
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['usuarioId', 'publicacionId']
+    }
+  ]
+});
 
-  });
 
   postulaciones.associate = (models) => {
     postulaciones.belongsTo(models.usuarios, {
@@ -19,3 +26,4 @@ module.exports = (sequelize, DataTypes) => {
 
   return postulaciones;
 };
+

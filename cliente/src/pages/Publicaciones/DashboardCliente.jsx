@@ -3,19 +3,21 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function DashboardCliente() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); // Id del cliente desde la URL
   const [user, setUser] = useState(null);
   const [publicaciones, setPublicaciones] = useState([]);
   const [postulantesPorPublicacion, setPostulantesPorPublicacion] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Cargar usuario (simulado) y validar rol
   useEffect(() => {
     if (!id) {
       navigate('/login');
       return;
     }
 
+    // Simular usuario cliente autenticado
     const usuarioSimulado = { id: parseInt(id), nombre: 'Cliente', role: 'cliente' };
     if (usuarioSimulado.role !== 'cliente') {
       navigate('/login');
@@ -24,6 +26,7 @@ function DashboardCliente() {
     setUser(usuarioSimulado);
   }, [id, navigate]);
 
+  // Traer publicaciones propias del cliente
   useEffect(() => {
     if (!user) return;
 
@@ -35,6 +38,7 @@ function DashboardCliente() {
         const data = await res.json();
         setPublicaciones(data);
 
+        // Por cada publicación traer sus postulantes
         const postulantesData = {};
         for (const pub of data) {
           const resPostulantes = await fetch(`http://localhost:3001/publicaciones/${pub.id}/candidatos`);
@@ -53,6 +57,7 @@ function DashboardCliente() {
     fetchPublicaciones();
   }, [user]);
 
+  // Cambiar estado de publicación manualmente (select)
   const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
     try {
       const res = await fetch(`http://localhost:3001/publicaciones/${publicacionId}`, {
@@ -72,6 +77,7 @@ function DashboardCliente() {
     }
   };
 
+  // Aceptar postulante
   const aceptarPostulante = async (postulacionId, publicacionId) => {
     try {
       const res = await fetch(`http://localhost:3001/postulaciones/${postulacionId}/aceptar`, {
@@ -79,6 +85,7 @@ function DashboardCliente() {
       });
       if (!res.ok) throw new Error('Error al aceptar postulante');
 
+      // Actualizar postulantes localmente
       const updatedPostulantes = postulantesPorPublicacion[publicacionId].map(p =>
         p.id === postulacionId ? { ...p, estado: 'aceptado' } : { ...p, estado: 'rechazado' }
       );
@@ -87,7 +94,14 @@ function DashboardCliente() {
         [publicacionId]: updatedPostulantes,
       }));
 
-      cambiarEstadoPublicacion(publicacionId, 'en_proceso');
+      // Actualizar publicación localmente
+      setPublicaciones(prev =>
+        prev.map(pub =>
+          pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
+        )
+      );
+
+      alert('Postulante aceptado correctamente.');
     } catch (err) {
       alert(err.message);
     }
@@ -104,7 +118,7 @@ function DashboardCliente() {
 
       <div className="flex gap-4 mb-4">
         <button
-          onClick={() => navigate('/publicaciones/crear')}
+          onClick={() => navigate(`/publicaciones/crear/${user?.id}`)}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
         >
           Crear Publicación
@@ -134,28 +148,20 @@ function DashboardCliente() {
               <p className="font-semibold">Pago: ${pub.pago}</p>
               <p>Estado: {pub.estado}</p>
 
+              {/* Cambiar estado manual */}
               <div className="my-2">
                 <label className="mr-2 font-semibold">Cambiar estado:</label>
                 <select
                   value={pub.estado}
                   onChange={e => cambiarEstadoPublicacion(pub.id, e.target.value)}
                   className="border rounded px-2 py-1"
+                  disabled={pub.estado !== 'abierto'} // desactivar si ya fue gestionada
                 >
                   <option value="abierto">Abierto</option>
                   <option value="en_proceso">En proceso</option>
                   <option value="cerrado">Cerrado</option>
                 </select>
               </div>
-
-              {/* Botón para ver mensaje del freelancer si hay alguno aceptado */}
-              {postulantesPorPublicacion[pub.id]?.some(p => p.estado === 'aceptado') && (
-                <button
-                  onClick={() => navigate(`/cliente/${id}/respuesta/${pub.id}`)}
-                  className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 mt-2"
-                >
-                  Ver respuesta del freelancer
-                </button>
-              )}
 
               {/* Postulantes */}
               <div className="mt-4">
@@ -172,7 +178,7 @@ function DashboardCliente() {
                         <div>
                           {post.freelancer?.nombre} {post.freelancer?.apellido} - Estado: {post.estado}
                         </div>
-                        {post.estado === 'pendiente' && (
+                        {post.estado === 'pendiente' && pub.estado === 'abierto' && (
                           <button
                             onClick={() => aceptarPostulante(post.id, pub.id)}
                             className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
