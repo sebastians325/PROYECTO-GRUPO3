@@ -16,7 +16,7 @@ function Pie(){
             <ul className='footer'>
                 <li id="Segundotitle"><strong>Cuenta</strong></li>
                 <li><Link to="/publicaciones/login">Login</Link></li>
-                <li><Link to="/register/cliente">Registro</Link></li>
+                <li><Link to="/register/cliente">Registro Cliente</Link></li>
                 <Link to="/register/freelancer">Registro Freelancer</Link>
                 <li>Carrito</li>
 

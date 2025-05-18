@@ -11,10 +11,12 @@ import DashboardCliente from './pages/Publicaciones/DashboardCliente';
 import DashboardFreelancer from './pages/Publicaciones/DashboardFreelancer'; // <--- IMPORTACIÓN AÑADIDA
 import PostularseComoFreelancer from './pages/Publicaciones/PostularseComoFreelancer';
 import Pie from './ComponentesGeneral/footer';
+import Header from './ComponentesGeneral/header';
 
 function App() {
   return (
     <div className="App">
+      <Header />
       <main>
       <Routes>
         <Route path="/" element={<LandingPage />} />
