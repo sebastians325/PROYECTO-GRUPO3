@@ -24,7 +24,7 @@ function App() {
         <Route path="/publicaciones/login" element={<LoginPage1 />} />
         <Route path="/dashboard/cliente/:id" element={<DashboardCliente />} />
         <Route path="/dashboard/freelancer/:id" element={<DashboardFreelancer />} /> {/* NUEVA RUTA */}
-        <Route path="/postulaciones" element={<PostularseComoFreelancer />} />
+        <Route path="/postular/:publicacionId" element={<PostularseComoFreelancer />} />
       </Routes>
     </div>
   );
