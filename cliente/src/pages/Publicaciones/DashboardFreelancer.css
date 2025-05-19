@@ -1,0 +1,161 @@
+/* Contenedor principal de la página del dashboard */
+.dashboard-freelancer-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53, #FFA07A); 
+  color: #FFFFFF;
+  min-height: 100vh;
+  padding-bottom: 50px; 
+  box-sizing: border-box;
+}
+
+/* Cabecera del Dashboard */
+.dashboard-header {
+  background-color: rgba(0, 0, 0, 0.15); /* Fondo oscuro semitransparente para la cabecera */
+  padding: 40px 0; /* Padding vertical generoso */
+  text-align: center;
+  margin-bottom: 40px; /* Espacio debajo de la cabecera */
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
+}
+
+.dashboard-header .container {
+  max-width: 960px;
+}
+
+.dashboard-header h1 {
+  font-size: 2.8rem; 
+  font-weight: 700; 
+  margin-bottom: 10px;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.dashboard-header p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85); 
+  max-width: 600px; 
+  margin: 0 auto;
+}
+
+/* Contenido principal del Dashboard */
+.dashboard-content {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+/* Sección de Acciones Rápidas/Principales */
+.quick-actions-section {
+  margin-bottom: 50px;
+}
+
+.quick-actions-section h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #FFFFFF; 
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2); 
+  display: inline-block; 
+  position: relative; 
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 30px;
+}
+
+/* Tarjetas de Acción */
+.action-card {
+  background-color: #FFFFFF;
+  color: #333333;
+  padding: 25px;
+  border-radius: 12px; 
+  text-decoration: none; 
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: center;
+}
+
+.action-card:hover {
+  transform: translateY(-8px) scale(1.02); 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  color: #D32F2F; 
+}
+
+.action-card .action-icon { 
+  font-size: 2.5rem; 
+  color: #FF5252; 
+  margin-bottom: 15px;
+}
+
+.action-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 0; 
+  margin-bottom: 10px;
+  color: #D32F2F; 
+}
+
+.action-card p {
+  font-size: 0.9rem;
+  color: #666666; 
+  line-height: 1.5;
+}
+
+/* Sección del Botón de Cerrar Sesión */
+.dashboard-logout-section {
+  margin-top: 40px;
+  text-align: center; 
+}
+
+/* Botón de Cerrar Sesión */
+.btn-logout {
+  background-color: #FF5252; 
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 30px; 
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.btn-logout:hover {
+  background-color: #E53935; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-logout .action-icon { 
+  margin-right: 8px;
+}
+
+.dashboard-loading,
+.dashboard-error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; 
+  font-size: 1.5rem;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 20px;
+}
+
+.dashboard-error-container {
+  background-color: rgba(179, 57, 57, 0.8); 
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 50px auto; 
+}

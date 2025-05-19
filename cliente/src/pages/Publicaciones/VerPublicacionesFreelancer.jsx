@@ -1,53 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import './VerPublicacionesFreelancer.css'; // Importa el archivo CSS
+import './VerPublicacionesFreelancer.css'; 
+import { Link } from 'react-router-dom'; 
 
-const VerPublicacionesFreelancer = ({ usuarioId }) => {
-  // ESTADO: Almacena las publicaciones obtenidas de la API.
+const VerPublicacionesFreelancer = () => {
   const [publicaciones, setPublicaciones] = useState([]);
-  // ESTADO: Indica si los datos se están cargando.
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [postulacionFeedback, setPostulacionFeedback] = useState({});
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // EFECTO: Se ejecuta una vez cuando el componente se monta para obtener las publicaciones.
   useEffect(() => {
     const fetchPublicaciones = async () => {
-      setIsLoading(true); // Inicia el estado de carga
-      setError(null); // Resetea cualquier error previo
+      setIsLoading(true); 
+      setError(null); 
       try {
         const response = await fetch('http://localhost:3001/publicaciones');
         if (!response.ok) {
-          // Si la respuesta no es exitosa (ej. 404, 500), lanza un error.
           throw new Error(`Error HTTP: ${response.status}`);
         }
-        const data = await response.json(); // Convierte la respuesta a JSON.
-        setPublicaciones(data); // Actualiza el estado con las publicaciones.
+        const data = await response.json(); 
+        setPublicaciones(data); 
       } catch (err) {
         console.error('Error al obtener publicaciones:', err);
         setError(err.message || 'Ocurrió un error desconocido al cargar las publicaciones.');
       } finally {
-        setIsLoading(false); // Finaliza el estado de carga.
+        setIsLoading(false); 
       }
     };
 
-    fetchPublicaciones(); // Llama a la función para obtener los datos.
+    fetchPublicaciones(); 
+
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token'); 
+    if (storedUser && token) {
+      setCurrentUser(storedUser);
+    }
   }, []); 
 
-  // FUNCIÓN: Maneja la lógica cuando un freelancer se postula a una publicación.
   const handlePostular = async (publicacionId) => {
-    // Actualiza el feedback para esta publicación a "cargando".
+    if (!currentUser || currentUser.role !== 'freelancer') {
+      setPostulacionFeedback(prev => ({
+        ...prev,
+        [publicacionId]: { type: 'error', message: 'Debes iniciar sesión como freelancer para postularte.' }
+      }));
+      return;
+    }
+
     setPostulacionFeedback(prev => ({
       ...prev,
       [publicacionId]: { type: 'loading', message: 'Postulando...' }
     }));
 
     try {
-      const bodyPayload = { usuarioId, publicacionId };
-
-
-      if (!usuarioId) {
-        console.warn("Intentando postular sin 'usuarioId'. La API podría rechazar esto.", bodyPayload);
-      }
+      const bodyPayload = { usuarioId: currentUser.id, publicacionId };
 
       const response = await fetch('http://localhost:3001/postulaciones', {
         method: 'POST',
@@ -56,19 +61,16 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
       });
 
       if (!response.ok) {
-        // Si la respuesta del backend no es exitosa, intenta obtener un mensaje de error del JSON.
         const errorData = await response.json().catch(() => ({ message: `Error del servidor: ${response.status}` }));
         throw new Error(errorData.message || `Error en la postulación: ${response.status}`);
       }
       
-      // Si la postulación es exitosa.
       setPostulacionFeedback(prev => ({
         ...prev,
         [publicacionId]: { type: 'success', message: '¡Postulación exitosa!' }
       }));
 
     } catch (err) {
-      // Si ocurre cualquier error durante el proceso de postulación.
       console.error('Error al postularse:', err);
       setPostulacionFeedback(prev => ({
         ...prev,
@@ -77,29 +79,26 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
     }
   };
 
-  // RENDERIZADO CONDICIONAL: Muestra un mensaje de carga.
   if (isLoading) {
     return (
-      <div className="pageContainer">
+      <div className="pageContainer"> 
         <div className="loadingContainer">
           <p>Cargando publicaciones...</p>
-          {/* Icono SVG de carga */}
-          <svg width="50" height="50" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#AD1457">
-              <g fill="none" fillRule="evenodd">
-                  <g transform="translate(1 1)" strokeWidth="2">
-                      <circle strokeOpacity=".5" cx="18" cy="18" r="18"/>
-                      <path d="M36 18c0-9.94-8.06-18-18-18">
-                          <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/>
-                      </path>
-                  </g>
+          <svg width="50" height="50" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#FFFFFF"> 
+            <g fill="none" fillRule="evenodd">
+              <g transform="translate(1 1)" strokeWidth="2">
+                <circle strokeOpacity=".5" cx="18" cy="18" r="18"/>
+                <path d="M36 18c0-9.94-8.06-18-18-18">
+                  <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/>
+                </path>
               </g>
+            </g>
           </svg>
         </div>
       </div>
     );
   }
 
-  // RENDERIZADO CONDICIONAL: Muestra un mensaje de error si falló la carga.
   if (error) {
     return (
       <div className="pageContainer">
@@ -111,23 +110,20 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
     );
   }
 
-  // RENDERIZADO PRINCIPAL: Muestra la lista de publicaciones.
   return (
     <div className="pageContainer">
       <h2 className="headerTitle">Publicaciones Disponibles</h2>
 
       {publicaciones.length === 0 ? (
-        // Mensaje si no hay publicaciones.
         <p className="noPublications">No hay publicaciones disponibles en este momento.</p>
       ) : (
-        // Cuadrícula para mostrar las tarjetas de publicaciones.
         <div className="publicationsGrid">
           {publicaciones.map((pub) => {
             const feedback = postulacionFeedback[pub.id];
             const isPostulando = feedback?.type === 'loading';
             const yaPostuladoExitosamente = feedback?.type === 'success';
-            
-            // Determina las clases CSS para el mensaje de feedback.
+            const puedePostular = currentUser && currentUser.role === 'freelancer';
+
             let feedbackClasses = "feedbackMessageBase";
             if (feedback?.type === 'success') {
               feedbackClasses += " feedbackSuccess";
@@ -138,14 +134,11 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
             }
 
             return (
-              // Cada tarjeta de publicación.
               <div key={pub.id} className="card">
-                {/* Sección superior de la tarjeta con la información */}
                 <div>
                   <h3 className="cardTitle">{pub.titulo}</h3>
                   <p className="cardDescription">{pub.descripcion}</p>
-                  {/* Contenedor para los detalles de la publicación */}
-                  <div style={{ marginBottom: '15px' }}> {/* Estilo en línea para un margen específico, puede moverse a CSS si se prefiere */}
+                  <div style={{ marginBottom: '15px' }}> 
                     <p className="cardInfoItem">
                       <span className="cardInfoLabel">Publicado por: </span>
                       {pub.cliente?.nombre || 'N/A'} {pub.cliente?.apellido || ''}
@@ -156,7 +149,6 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
                     </p>
                     <p className="cardInfoItem">
                       <span className="cardInfoLabel">Estado: </span>
-                      {/* El badge de estado cambia de clase según el estado de la publicación */}
                       <span className={`estadoBadgeBase ${pub.estado === 'abierto' ? 'estadoAbierto' : 'estadoOtro'}`}>
                         {pub.estado}
                       </span>
@@ -164,23 +156,26 @@ const VerPublicacionesFreelancer = ({ usuarioId }) => {
                   </div>
                 </div>
 
-                {}
-                <div>
-                  {}
+                <div className="card-actions-footer"> 
                   {feedback && (
                     <div className={feedbackClasses}>
                       {feedback.message}
                     </div>
                   )}
-                  {/* Botón para postularse */}
-                  <button
-                    onClick={() => handlePostular(pub.id)}
-                    // Deshabilita el botón si se está postulando o si ya se postuló exitosamente.
-                    disabled={isPostulando || yaPostuladoExitosamente}
-                    className="button"
-                  >
-                    {isPostulando ? 'Procesando...' : (yaPostuladoExitosamente ? 'Postulado ✓' : 'Postularme')}
-                  </button>
+
+                  {puedePostular ? (
+                    <button
+                      onClick={() => handlePostular(pub.id)}
+                      disabled={isPostulando || yaPostuladoExitosamente}
+                      className="button" 
+                    >
+                      {isPostulando ? 'Procesando...' : (yaPostuladoExitosamente ? 'Postulado ✓' : 'Postularme')}
+                    </button>
+                  ) : (
+                    <Link to="/publicaciones/login" className="button button-login-prompt">
+                      Inicia sesión como Freelancer para postularte
+                    </Link>
+                  )}
                 </div>
               </div>
             );
