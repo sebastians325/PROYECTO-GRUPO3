@@ -1,4 +1,6 @@
 // App.jsx
+
+
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from './PaginasUsuario/LandingPage';
@@ -26,11 +28,7 @@ function App() {
           <Route path="/confirmation" element={<ConfirmationPage />} />
           <Route path="/publicaciones/crear/:id" element={<CrearPublicacionCliente />} />
           <Route path="/publicaciones/ver/:id" element={<VerPublicacionesFreelancer />} />
-          
-          {/* NUEVA RUTA: Para el enlace "Ver Proyectos" del footer. 
-              Esta ruta no requiere un ID y muestra todas las publicaciones disponibles. */}
           <Route path="/proyectos-disponibles" element={<VerPublicacionesFreelancer />} />
-
           <Route path="/publicaciones/login" element={<LoginPage1 />} />
           <Route path="/dashboard/cliente/:id" element={<DashboardCliente />} />
           <Route path="/dashboard/freelancer/:id" element={<DashboardFreelancer />} /> 
@@ -43,3 +41,6 @@ function App() {
 }
 
 export default App;
+
+
+
