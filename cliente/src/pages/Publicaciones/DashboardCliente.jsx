@@ -1,142 +1,271 @@
-//Publicaciones/DashboardCliente.jsx
-
-import { useNavigate, useParams } from 'react-router-dom';
-import { usePublicacionesCliente } from '../components/usePublicacionesCliente';
-import PostulanteCard from '../components/PostulanteCard';
-import { aceptarPostulanteAPI } from '../services/postulacionService';
-import PublicacionService from '../services/publicacionService';
-//import { cambiarEstadoPublicacionAPI } from '../services/publicacionService';
-
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import './DashboardCliente.css'; 
 
 function DashboardCliente() {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const usuarioSimulado = { id: parseInt(id), nombre: 'Cliente', role: 'cliente' };
+  const { id } = useParams(); 
+  const [user, setUser] = useState(null); 
+  const [publicaciones, setPublicaciones] = useState([]); 
+  const [postulantesPorPublicacion, setPostulantesPorPublicacion] = useState({}); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(''); // Definición de setError
 
-  // Hooks siempre al inicio
-  const {
-    publicaciones,
-    setPublicaciones,
-    postulantesPorPublicacion,
-    setPostulantesPorPublicacion,
-    loading,
-    error
-  } = usePublicacionesCliente(usuarioSimulado.id);
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token'); 
+    
+    if (!token || !storedUser || storedUser.role !== 'cliente' || storedUser.id !== parseInt(id)) {
+      localStorage.clear(); 
+      setError('Acceso no autorizado o sesión inválida. Por favor, inicia sesión de nuevo.'); 
+      navigate('/publicaciones/login'); 
+      return; 
+    }
+    setUser(storedUser); 
+  }, [id, navigate]); 
 
-  // Validación dentro del efecto, no antes del hook
-  if (!id || usuarioSimulado.role !== 'cliente') {
-    navigate('/login');
-    return null;
-  }
+  useEffect(() => {
+    if (!user) return;
 
-  const cambiarEstado = async (publicacionId, nuevoEstado) => {
+    async function fetchPublicacionesYPostulantes() {
+      setLoading(true); 
+      setError(''); 
+      try {
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const resPublicaciones = await fetch(`http://localhost:3001/publicaciones?usuarioId=${user.id}`, { headers }); 
+        if (!resPublicaciones.ok) {
+            const errData = await resPublicaciones.json().catch(() => ({message: 'Error al obtener tus publicaciones'}));
+            throw new Error(errData.message);
+        }
+        const dataPublicaciones = await resPublicaciones.json();
+        setPublicaciones(dataPublicaciones); 
+
+        const postulantesData = {};
+        for (const pub of dataPublicaciones) { 
+          try {
+            const resPostulantes = await fetch(`http://localhost:3001/publicaciones/${pub.id}/candidatos`, { headers });
+            if (resPostulantes.ok) {
+              const postulantes = await resPostulantes.json();
+              postulantesData[pub.id] = postulantes; 
+            } else {
+              console.warn(`No se pudieron obtener postulantes para la publicación ${pub.id}. Estado: ${resPostulantes.status}`);
+              postulantesData[pub.id] = []; 
+            }
+          } catch (postulantesError) {
+            console.error(`Error obteniendo postulantes para pub ${pub.id}:`, postulantesError);
+            postulantesData[pub.id] = []; 
+          }
+        }
+        setPostulantesPorPublicacion(postulantesData); 
+
+      } catch (err) {
+        console.error("Error en fetchPublicacionesYPostulantes:", err);
+        setError(err.message || "Ocurrió un error al cargar los datos de tus publicaciones."); 
+      } finally {
+        setLoading(false); 
+      }
+    }
+    fetchPublicacionesYPostulantes(); 
+  }, [user]); 
+
+  const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
     try {
-      
-      await PublicacionService.cambiarEstadoPublicacionAPI(publicacionId, nuevoEstado);
-      setPublicaciones(prev =>
-        prev.map(pub =>
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError("Sesión no válida. Por favor, inicia sesión de nuevo."); 
+        return;
+      }
+
+      const res = await fetch(`http://localhost:3001/publicaciones/${publicacionId}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ estado: nuevoEstado }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: 'Error al actualizar estado de la publicación' }));
+        throw new Error(errorData.message);
+      }
+
+      setPublicaciones(prevPublicaciones =>
+        prevPublicaciones.map(pub => 
           pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
         )
       );
     } catch (err) {
-      alert(err.message);
+      console.error("Error en cambiarEstadoPublicacion:", err);
+      setError(`Error al cambiar estado: ${err.message}`); 
     }
   };
 
   const aceptarPostulante = async (postulacionId, publicacionId) => {
     try {
-      await aceptarPostulanteAPI(postulacionId);
-      const actualizados = postulantesPorPublicacion[publicacionId].map(p =>
-        p.id === postulacionId
-          ? { ...p, estado: 'aceptado' }
-          : { ...p, estado: 'rechazado' }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError("Sesión no válida. Por favor, inicia sesión de nuevo."); 
+        return;
+      }
+
+      // Obtener la publicación actual para acceder a su estado.
+      const publicacionActual = publicaciones.find(p => p.id === publicacionId);
+      if (!publicacionActual) {
+        setError("Error interno: No se encontró la publicación asociada.");
+        throw new Error("No se encontró la publicación para aceptar al postulante.");
+      }
+
+      const res = await fetch(`http://localhost:3001/postulaciones/${postulacionId}/aceptar`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}` 
+        }
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: 'Error al aceptar el postulante' }));
+        throw new Error(errorData.message);
+      }
+
+      const updatedPostulantes = (postulantesPorPublicacion[publicacionId] || []).map(p => 
+        p.id === postulacionId 
+          ? { ...p, estado: 'aceptado' } 
+          : { ...p, estado: (p.estado === 'pendiente' && publicacionActual.estado === 'abierto') ? 'rechazado' : p.estado } 
       );
       setPostulantesPorPublicacion(prev => ({
         ...prev,
-        [publicacionId]: actualizados,
+        [publicacionId]: updatedPostulantes,
       }));
 
-      setPublicaciones(prev =>
-        prev.map(pub =>
+      setPublicaciones(prevPublicaciones =>
+        prevPublicaciones.map(pub =>
           pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
         )
       );
-
-      alert('Postulante aceptado correctamente.');
+      alert('Postulante aceptado exitosamente. La publicación ahora está "en proceso".');
     } catch (err) {
-      alert(err.message);
+      console.error("Error en aceptarPostulante:", err);
+      setError(`Error al aceptar postulante: ${err.message}`); 
     }
   };
 
-  const logout = () => {
-    localStorage.clear();
-    navigate('/');
+  const handleLogout = () => { 
+    localStorage.clear(); 
+    navigate('/'); 
   };
 
+  // USO DE error para mostrar el mensaje
+  if (error && !loading) { 
+    return <div className="dashboard-error-container">{error}</div>;
+  }
+  
+  if (!user) { 
+    return <div className="dashboard-loading">Cargando panel de Cliente...</div>;
+  }
+
   return (
-    <div className="dashboard-cliente p-4">
-      <h2 className="text-2xl font-bold mb-2">Bienvenido, {usuarioSimulado.nombre}</h2>
+    <div className="dashboard-cliente-container">
+      <header className="dashboard-header">
+        <div className="container">
+          <h1>Bienvenido, {user.nombre || 'Cliente'}</h1> 
+          <p>Gestiona tus publicaciones y selecciona a los mejores freelancers para tus proyectos.</p>
+        </div>
+      </header>
 
-      <div className="flex gap-4 mb-4">
-        <button
-          onClick={() => navigate(`/publicaciones/crear/${usuarioSimulado.id}`)}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-        >
-          Crear Publicación
-        </button>
-        <button
-          onClick={logout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          Cerrar sesión
-        </button>
-      </div>
+      <main className="dashboard-content container">
+        <div className="dashboard-actions-bar">
+          <Link to={`/publicaciones/crear/${user.id}`} className="btn btn-crear-publicacion">
+            Crear Nueva Publicación
+          </Link>
+          <button onClick={handleLogout} className="btn btn-logout-dashboard">
+            Cerrar Sesión
+          </button>
+        </div>
 
-      <h3 className="text-xl font-semibold mb-2">Mis Publicaciones</h3>
-      {loading ? (
-        <p>Cargando...</p>
-      ) : error ? (
-        <p className="text-red-600">{error}</p>
-      ) : (
-        publicaciones.map(pub => (
-          <div key={pub.id} className="border p-4 rounded shadow">
-            <h4 className="text-lg font-bold">{pub.titulo}</h4>
-            <p>{pub.descripcion}</p>
-            <p>Pago: ${pub.pago}</p>
-            <p>Estado: {pub.estado}</p>
+        <section className="mis-publicaciones-section">
+          <h2 className="section-title">Mis Publicaciones</h2>
+          
+          {loading && <p className="loading-message">Cargando tus publicaciones...</p>}
 
-            <div className="my-2">
-              <label className="mr-2 font-semibold">Cambiar estado:</label>
-              <select
-                value={pub.estado}
-                onChange={e => cambiarEstado(pub.id, e.target.value)}
-                disabled={pub.estado !== 'abierto'}
-                className="border px-2 py-1"
-              >
-                <option value="abierto">Abierto</option>
-                <option value="en_proceso">En proceso</option>
-                <option value="cerrado">Cerrado</option>
-              </select>
+          {/* Muestra el error si existe y no está cargando */}
+          {!loading && error && <p className="error-message">{error}</p>} 
+
+          {!loading && publicaciones.length === 0 && !error && (
+            <p className="no-publications-message">Aún no has creado ninguna publicación. ¡Crea una ahora!</p>
+          )}
+
+          {!loading && publicaciones.length > 0 && (
+            <div className="publicaciones-grid">
+              {publicaciones.map(pub => ( 
+                <div key={pub.id} className="publication-card">
+                  <div className="publication-card-header">
+                    <h3 className="publication-title">{pub.titulo}</h3>
+                    <span className={`publication-status status-${pub.estado?.toLowerCase().replace('_', '-') || 'desconocido'}`}>
+                      {pub.estado?.replace('_', ' ') || 'Desconocido'}
+                    </span>
+                  </div>
+                  <p className="publication-description">{pub.descripcion}</p>
+                  <p className="publication-pago">Presupuesto: <strong>${pub.pago}</strong></p>
+                  
+                  <div className="publication-actions">
+                    <label htmlFor={`estado-select-${pub.id}`} className="estado-label">Cambiar estado:</label>
+                    <select
+                      id={`estado-select-${pub.id}`}
+                      value={pub.estado}
+                      onChange={e => cambiarEstadoPublicacion(pub.id, e.target.value)}
+                      className="estado-select"
+                      disabled={pub.estado === 'cerrado'} 
+                    >
+                      <option value="abierto">Abierto</option>
+                      <option value="en_proceso">En Proceso</option>
+                      <option value="cerrado">Cerrado</option>
+                    </select>
+                  </div>
+
+                  <div className="postulantes-section">
+                    <h4 className="postulantes-title">Postulantes ({postulantesPorPublicacion[pub.id]?.length || 0}):</h4>
+                    {(postulantesPorPublicacion[pub.id]?.length || 0) === 0 ? (
+                      <p className="no-postulantes-message">Aún no hay postulantes para este proyecto.</p>
+                    ) : (
+                      <ul className="postulantes-list">
+                        {(postulantesPorPublicacion[pub.id] || []).map(post => ( 
+                          <li key={post.id} className="postulante-item">
+                            <div className="postulante-info">
+                              <span>{post.freelancer?.nombre || 'Freelancer'} {post.freelancer?.apellido || ''}</span>
+                              <span className={`postulante-status status-${post.estado?.toLowerCase()}`}>
+                                (Estado: {post.estado})
+                              </span>
+                            </div>
+                            {post.estado === 'pendiente' && pub.estado === 'abierto' && (
+                              <button
+                                onClick={() => aceptarPostulante(post.id, pub.id)} 
+                                className="btn btn-aceptar-postulante"
+                              >
+                                Aceptar Freelancer
+                              </button>
+                            )}
+                             {post.estado === 'aceptado' && pub.estado === 'en_proceso' && (
+                                <span className="postulante-aceptado-badge">¡Contratado!</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <div className="mt-4">
-              <h5 className="font-semibold">Postulantes:</h5>
-              {postulantesPorPublicacion[pub.id]?.length === 0 ? (
-                <p>No hay postulantes.</p>
-              ) : (
-                postulantesPorPublicacion[pub.id].map(post => (
-                  <PostulanteCard
-                    key={post.id}
-                    postulante={post}
-                    puedeAceptar={post.estado === 'pendiente' && pub.estado === 'abierto'}
-                    onAceptar={() => aceptarPostulante(post.id, pub.id)}
-                  />
-                ))
-              )}
-            </div>
-          </div>
-        ))
-      )}
+          )}
+        </section>
+      </main>
     </div>
   );
 }

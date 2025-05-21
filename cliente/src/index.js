@@ -3,16 +3,19 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
-//import Pie from '../src/ComponentesGeneral/footer'
+import { ServicioPublicacionesProvider } from './Context/ServicioPublicacionesContext'; //Importa el Provider
+import { MockPublicacionesService } from './services/MockPublicacionesService'; // usar mock
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <BrowserRouter>
-    <App />
+    {/*<ServicioPublicacionesProvider>  D*/}
+    <ServicioPublicacionesProvider servicio={MockPublicacionesService}>
+      <App />
+    </ServicioPublicacionesProvider>
   </BrowserRouter>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

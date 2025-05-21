@@ -1,0 +1,216 @@
+/* src/pages/Publicaciones/VerPublicacionesFreelancer.css */
+
+.pageContainer {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53, #FFA07A); /* Rojo/Coral -> Naranja Medio -> Salmón Claro */
+  color: #FFFFFF; 
+  min-height: 100vh;
+  height: 100%;
+  padding: 25px; 
+  box-sizing: border-box;
+}
+
+.headerTitle {
+  text-align: center;
+  font-size: 2.6rem; 
+  color: #FFFFFF; 
+  margin-bottom: 40px;
+  font-weight: 700; 
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25); 
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 100px); 
+  font-size: 1.5rem;
+  color: #FFFFFF; 
+}
+
+.loadingContainer svg {
+  margin-top: 20px;
+  stroke: #FFFFFF; 
+}
+
+.errorContainer {
+  text-align: center;
+  padding: 35px;
+  font-size: 1.2rem;
+  color: #FFFFFF; 
+  background-color: rgba(179, 57, 57, 0.7); 
+  border-radius: 12px; 
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.publicationsGrid {
+  display: grid;
+  /* CAMBIO CLAVE: Forzar 2 columnas. 
+     Cada columna tomará una fracción igual del espacio disponible. */
+  grid-template-columns: repeat(2, 1fr); 
+  /* Si prefieres que las tarjetas tengan un tamaño mínimo y se ajusten, 
+     podrías usar algo como: grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+     Ajusta 450px según el ancho deseado para que generalmente resulten 2 columnas.
+  */
+  gap: 30px; 
+  max-width: 1200px; 
+  margin: 0 auto; 
+}
+
+.card {
+  background-color: #FFFFFF; 
+  color: #333333; 
+  border-radius: 16px; 
+  padding: 25px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  border: 1px solid #FBE9E7; 
+}
+
+.card:hover {
+  transform: translateY(-6px); 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.cardTitle {
+  font-size: 1.6rem; 
+  font-weight: 700; 
+  color: #D32F2F; 
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+.cardDescription {
+  font-size: 0.95rem;
+  color: #555555; 
+  margin-bottom: 18px;
+  line-height: 1.6;
+  flex-grow: 1; 
+  max-height: 150px; 
+  overflow-y: auto; 
+  padding-right: 8px; 
+}
+
+.cardDescription::-webkit-scrollbar {
+  width: 5px;
+}
+.cardDescription::-webkit-scrollbar-track {
+  background: #FBE9E7; 
+  border-radius: 10px;
+}
+.cardDescription::-webkit-scrollbar-thumb {
+  background: #FFAB91; 
+  border-radius: 10px;
+}
+.cardDescription::-webkit-scrollbar-thumb:hover {
+  background: #FF8A65; 
+}
+
+.cardInfoItem {
+  font-size: 0.9rem;
+  color: #666666; 
+  margin-bottom: 8px;
+}
+
+.cardInfoLabel {
+  font-weight: 600; 
+  color: #444444; 
+}
+
+.estadoBadgeBase {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: inline-block;
+  text-transform: capitalize;
+  border: 1px solid;
+}
+
+.estadoAbierto {
+  background-color: rgba(102, 187, 106, 0.15); 
+  color: #2E7D32; 
+  border-color: #66BB6A; 
+}
+
+.estadoOtro { 
+  background-color: rgba(255, 167, 38, 0.15); 
+  color: #EF6C00; 
+  border-color: #FFA726; 
+}
+
+.button {
+  background-color: #FF5252; 
+  color: #FFFFFF; 
+  border: none;
+  padding: 12px 22px; 
+  border-radius: 8px; 
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600; 
+  width: 100%;
+  margin-top: 18px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.button:hover:not(:disabled) {
+   background-color: #FF1744; 
+   transform: translateY(-1px); 
+   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.button:disabled {
+  background-color: #FFCDD2; 
+  color: #EF9A9A; 
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.feedbackMessageBase {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.feedbackSuccess {
+  background-color: rgba(102, 187, 106, 0.2); 
+  color: #1B5E20;
+  border-color: rgba(76, 175, 80, 0.5);
+}
+
+.feedbackError {
+  background-color: rgba(239, 83, 80, 0.15); 
+  color: #C62828;
+  border-color: rgba(211, 47, 47, 0.4);
+}
+
+.feedbackLoading {
+  color: #D32F2F; 
+  padding-top: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.noPublications {
+  text-align: center;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.9); 
+  margin-top: 50px;
+  padding: 20px;
+  background-color: rgba(0,0,0,0.1); 
+  border-radius: 8px;
+}

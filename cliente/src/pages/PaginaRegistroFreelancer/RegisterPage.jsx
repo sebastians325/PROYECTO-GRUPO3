@@ -153,7 +153,6 @@ const RegisterPage = () => {
                  
                 <button type="submit">Registrarse</button>
             </form>
-            <Pie />
         </div>
     );
 };

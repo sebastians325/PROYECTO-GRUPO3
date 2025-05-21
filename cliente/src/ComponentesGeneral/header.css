@@ -1,0 +1,92 @@
+/* src/ComponentesGeneral/header.css */
+
+/* Estilo principal para la barra de navegación personalizada */
+.navbar-custom {
+  background: linear-gradient(90deg, #FF6B6B 0%, #FF8E53 50%, #FFA07A 100%); 
+  padding: 0.8rem 1rem; 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); 
+  transition: background-color 0.3s ease;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start; 
+}
+
+/* Estilo para la marca/logo "LaboraPe" */
+.navbar-brand-custom {
+  font-size: 1.75rem; 
+  font-weight: 700; 
+  color: #FFFFFF !important; 
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); 
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  margin-right: 1rem;
+}
+
+.navbar-brand-custom:hover {
+  color: #FFF3E0 !important; 
+  transform: scale(1.05); 
+}
+
+/* Contenedor de los enlaces de navegación */
+.navbar-custom .navbar-collapse {
+  display: flex !important;
+  flex-basis: auto; 
+}
+
+/* Lista de navegación */
+.navbar-custom .navbar-nav {
+  flex-direction: row; 
+}
+
+.nav-item-custom {
+  margin-left: 0.5rem; 
+  margin-right: 0.5rem;
+}
+
+.nav-link-custom {
+  color: rgba(255, 255, 255, 0.85) !important; 
+  font-size: 1rem; 
+  font-weight: 500; 
+  padding: 0.6rem 0.8rem !important; 
+  border-radius: 6px; 
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  position: relative; 
+}
+
+.nav-link-custom:hover,
+.nav-link-custom:focus {
+  color: #FFFFFF !important; 
+  background-color: rgba(255, 255, 255, 0.1); 
+}
+
+.nav-link-custom.active {
+  color: #FFFFFF !important;
+  font-weight: 700; 
+  background-color: rgba(255, 255, 255, 0.2); 
+}
+
+.nav-link-custom::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0px; 
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #FFFFFF; 
+  transition: width 0.3s ease-in-out;
+}
+
+.nav-link-custom:hover::after,
+.nav-link-custom.active::after {
+  width: 70%; 
+}
+
+.navbar-toggler-custom {
+  display: none !important; 
+}
+
+.navbar-toggler-icon-custom {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+

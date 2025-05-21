@@ -102,7 +102,6 @@ const RegisterPageCliente = () => {
                 {/* Quitamos los campos de Rol, Especialidad y Bio */}
                 <button type="submit">Registrarse como Cliente</button> {/* Texto botón específico */}
             </form>
-            <Pie />
         </div>
     );
 };
