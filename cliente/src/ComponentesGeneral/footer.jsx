@@ -1,40 +1,35 @@
 import React from "react";
-// Asegúrate que el nombre del archivo CSS coincida exactamente.
-// Si tu archivo es 'footer.css' (minúsculas), la importación debe ser así:
 import './footer.css'; 
 import { Link } from 'react-router-dom';
-// Opcional: Para iconos de redes sociales
-// import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
 function Footer() { 
   const currentYear = new Date().getFullYear();
 
   return (
-    // 1. Este es el contenedor principal del footer. TODO el contenido del footer,
-    //    incluyendo el copyright, DEBE estar DENTRO de esta etiqueta <footer>.
     <footer className="footer-container">
       
-      {/* 2. Este div agrupa las columnas principales de enlaces e información. */}
-      <div className="footer-content">
+      <div className="footer-content"> 
         
-        {/* Columna 1: Información de la Marca */}
+        {/* Columna 1: Información de la Marca y Redes Sociales */}
         <div className="footer-section footer-brand-info">
           <h3 className="brand-name">LaboraPe</h3> 
-          <p style={{ fontSize: '0.9rem', color: '#A1887F', marginTop: '10px' }}> 
-            © {currentYear} LaboraPe
-          </p>
-          <p style={{ fontSize: '0.9rem', marginTop: '5px' }}>
-            <Link to="/politica-privacidad">Privacy</Link> - <Link to="/terminos-condiciones">Terms</Link>
-          </p>
+          <p className="brand-tagline">Conectando talento con oportunidades.</p>
+          
+          {/* Iconos de Redes Sociales */}
           <div className="footer-social-media">
-            <a href="https://facebook.com" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-facebook-f"></i>
+            {/* Reemplaza "#" o las URLs de ejemplo con las URLs reales de tus perfiles */}
+            <a href="https://facebook.com/tuLaboraPe" aria-label="Facebook de LaboraPe" target="_blank" rel="noopener noreferrer" title="Facebook">
+              <FaFacebookF />
             </a>
-            <a href="https://twitter.com" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-twitter"></i>
+            <a href="https://twitter.com/tuLaboraPe" aria-label="Twitter de LaboraPe" target="_blank" rel="noopener noreferrer" title="Twitter">
+              <FaTwitter />
             </a>
-            <a href="https://instagram.com" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-instagram"></i>
+            <a href="https://instagram.com/tuLaboraPe" aria-label="Instagram de LaboraPe" target="_blank" rel="noopener noreferrer" title="Instagram">
+              <FaInstagram />
+            </a>
+            <a href="https://linkedin.com/company/tuLaboraPe" aria-label="LinkedIn de LaboraPe" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+              <FaLinkedinIn />
             </a>
           </div>
         </div>
@@ -46,17 +41,16 @@ function Footer() {
             <li><Link to="/publicaciones/login">Login</Link></li>
             <li><Link to="/register/cliente">Registro Cliente</Link></li>
             <li><Link to="/register/freelancer">Registro Freelancer</Link></li>
-            <li><Link to="/carrito">Carrito</Link></li>
           </ul>
         </div>
 
-        {/* Columna 3: Productos/LaboraPe */}
+        {/* Columna 3: Explorar */}
         <div className="footer-section">
-          <h4>Productos</h4> 
+          <h4>Explorar</h4>
           <ul>
-            <li><Link to="/productos/mas-vendidos">Más vendidos</Link></li>
-            <li><Link to="/productos/nuevos">Nuevos</Link></li>
-            <li><Link to="/productos/ofertas">Ofertas</Link></li>
+            <li><Link to="/proyectos-disponibles">Ver Proyectos</Link></li>
+            <li><Link to="/como-funciona">¿Cómo Funciona?</Link></li>
+            <li><Link to="/blog">Nuestro Blog</Link></li> 
           </ul>
         </div>
 
@@ -65,24 +59,23 @@ function Footer() {
           <h4>Ayuda</h4>
           <ul>
             <li><Link to="/acerca-de">Acerca de Nosotros</Link></li>
-            <li><Link to="/politica-envio">Política de Envío</Link></li>
+            <li><Link to="/politica-de-uso">Política de Uso</Link></li> 
             <li><Link to="/faq">FAQ</Link></li>
+            <li><Link to="/contacto">Contáctanos</Link></li>
           </ul>
         </div>
       </div> {/* Fin de .footer-content */}
 
-      {/* 3. Esta es la sección del copyright. DEBE estar DENTRO de <footer className="footer-container">
-             y DESPUÉS de <div className="footer-content">. */}
+      {/* Sección inferior del footer para copyright y enlaces legales */}
       <div className="footer-bottom">
         <p>&copy; {currentYear} LaboraPe. Todos los derechos reservados.</p>
-        {/* Si quieres repetir los enlaces de privacidad y términos aquí también, puedes hacerlo */}
-        {/* <p>
-          <Link to="/politica-privacidad">Privacy</Link> | <Link to="/terminos-condiciones">Terms</Link>
-        </p> */}
+        <p>
+          <Link to="/politica-privacidad">Privacy</Link> - <Link to="/terminos-condiciones">Terms</Link>
+        </p>
       </div> {/* Fin de .footer-bottom */}
 
     </footer> /* Fin de .footer-container */
   );
 }
 
-export default Footer; 
+export default Footer;

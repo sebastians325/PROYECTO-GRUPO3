@@ -10,6 +10,7 @@
     "pg-hstore": "^2.3.4",
     "pg-protocol": "^1.10.0",
     "postgres": "^3.4.5",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.0",
     "react-scripts": "^5.0.1",
     "sequelize": "^6.37.7",
