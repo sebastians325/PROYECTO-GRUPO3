@@ -1,23 +1,23 @@
+// pages/Publicaciones/CrearPublicacionCliente.jsx
+//S unica responsabilidad
 import React, { useState } from 'react';
-//import { useParams } from 'react-router-dom';
+import { useServicioPublicaciones } from '../../Context/ServicioPublicacionesContext';
+import { validarFormularioPublicacion } from '../../utils/ValidacionPublicacion';
 
 const CrearPublicacionCliente = () => {
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
-    pago: '', // Aquí agregamos el campo pago
+    pago: '',
   });
 
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
+  const publicacionesService = useServicioPublicaciones();
 
-  // ⚠️ Reemplaza esto con el ID del cliente autenticado (puede venir de contexto o login)
-  //const usuarioId = 3;
-  //const { id } = useParams(); // Id del cliente desde la URL
-  //const { id } = useParams(); // usuarioId dinámico
-  //const usuarioId = parseInt(id, 10);
   const userStored = JSON.parse(localStorage.getItem('user'));
   const usuarioId = userStored?.id;
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -30,26 +30,18 @@ const CrearPublicacionCliente = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.titulo || !formData.descripcion || !formData.pago) {
-      setError('Completa todos los campos.');
+    const errores = validarFormularioPublicacion(formData);
+    if (Object.keys(errores).length > 0) {
+      setError(Object.values(errores).join(' '));
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:3001/publicaciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ...formData, 
-          pago: parseFloat(formData.pago), // ✅ Conversión segura a número
-          usuarioId 
-        }),
+      await publicacionesService.crearPublicacion({
+        ...formData,
+        pago: parseFloat(formData.pago),
+        usuarioId,
       });
-
-      if (!response.ok) {
-        const resData = await response.json();
-        throw new Error(resData.error || 'Error al crear publicación');
-      }
 
       setFormData({ titulo: '', descripcion: '', pago: '' });
       setMensaje('Publicación creada exitosamente.');
@@ -111,3 +103,4 @@ const CrearPublicacionCliente = () => {
 };
 
 export default CrearPublicacionCliente;
+
