@@ -8,7 +8,7 @@ function Header() {
   return (
     <nav className="navbar navbar-expand-lg navbar-custom sticky-top">
       <div className="container px-4">
-        {/* Marca/Logo de la empresa */}
+        {/* Marca/Logo de la empresa si es que se agregara*/}
         <Link className="navbar-brand-custom" to="/">
           LaboraPe 
         </Link>
@@ -17,7 +17,7 @@ function Header() {
           className="navbar-toggler-custom"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarNavContentHeader" // ID único para este navbar
+          data-bs-target="#navbarNavContentHeader"
           aria-controls="navbarNavContentHeader"
           aria-expanded="false"
           aria-label="Toggle navigation"

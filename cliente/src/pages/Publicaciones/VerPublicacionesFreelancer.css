@@ -48,13 +48,7 @@
 
 .publicationsGrid {
   display: grid;
-  /* CAMBIO CLAVE: Forzar 2 columnas. 
-     Cada columna tomará una fracción igual del espacio disponible. */
   grid-template-columns: repeat(2, 1fr); 
-  /* Si prefieres que las tarjetas tengan un tamaño mínimo y se ajusten, 
-     podrías usar algo como: grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
-     Ajusta 450px según el ancho deseado para que generalmente resulten 2 columnas.
-  */
   gap: 30px; 
   max-width: 1200px; 
   margin: 0 auto; 
