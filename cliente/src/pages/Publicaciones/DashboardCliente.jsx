@@ -142,7 +142,7 @@ function DashboardCliente() {
       );
       setPostulantesPorPublicacion(prev => ({
         ...prev,
-        [publicacionId]: actualizados,
+        [publicacionId]: updatedPostulantes,  // Using the correct variable name
       }));
 
       setPublicaciones(prevPublicaciones =>
