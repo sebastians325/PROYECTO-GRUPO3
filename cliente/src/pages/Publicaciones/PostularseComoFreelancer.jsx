@@ -1,27 +1,19 @@
+//Publicaciones/PostularseComoFreelancer.jsx
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import AuthService from '../utils/AuthService';
+import PublicacionService from '../services/publicacionService';
 
-const PostularseComoFreelancer = ({ publicacionId }) => {
+const PostularseComoFreelancer = () => {
+  const { publicacionId } = useParams();
+  const usuarioId = AuthService.getUser()?.id;
+
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
-  // ⚠️ Reemplaza esto con el ID del freelancer autenticado (puede venir de contexto o token)
-  //const usuarioId = 1;
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-  const usuarioId = storedUser?.id;
-
   const handlePostular = async () => {
     try {
-      const response = await fetch('http://localhost:3001/postulaciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuarioId, publicacionId }),
-      });
-
-      if (!response.ok) {
-        const resData = await response.json();
-        throw new Error(resData.error || 'Error al postularse');
-      }
-
+      await PublicacionService.postularse(usuarioId, publicacionId);
       setMensaje('Te has postulado exitosamente.');
     } catch (err) {
       setError(err.message);
@@ -29,18 +21,11 @@ const PostularseComoFreelancer = ({ publicacionId }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-8 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Postúlate a esta publicación</h2>
-
-      <button
-        onClick={handlePostular}
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Postularme
-      </button>
-
-      {mensaje && <p className="text-green-600 mt-4">{mensaje}</p>}
-      {error && <p className="text-red-600 mt-4">{error}</p>}
+    <div>
+      <h2>Postularse a la Publicación</h2>
+      {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <button onClick={handlePostular}>Postularse</button>
     </div>
   );
 };

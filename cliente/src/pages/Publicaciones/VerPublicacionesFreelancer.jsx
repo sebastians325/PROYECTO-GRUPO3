@@ -3,6 +3,7 @@ import './VerPublicacionesFreelancer.css';
 import { Link } from 'react-router-dom'; 
 
 const VerPublicacionesFreelancer = () => {
+const VerPublicacionesFreelancer = () => {
   const [publicaciones, setPublicaciones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
