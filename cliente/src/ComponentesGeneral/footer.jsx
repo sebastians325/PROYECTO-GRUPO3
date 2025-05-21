@@ -1,6 +1,7 @@
 import React from "react";
 import './footer.css'; 
 import { Link } from 'react-router-dom';
+// Asegúrate de tener react-icons instalado si los usas: npm install react-icons
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
 function Footer() { 
@@ -41,6 +42,7 @@ function Footer() {
             <li><Link to="/publicaciones/login">Login</Link></li>
             <li><Link to="/register/cliente">Registro Cliente</Link></li>
             <li><Link to="/register/freelancer">Registro Freelancer</Link></li>
+            <li><Link to="/carrito">Carrito</Link></li> 
           </ul>
         </div>
 
@@ -48,6 +50,11 @@ function Footer() {
         <div className="footer-section">
           <h4>Explorar</h4>
           <ul>
+            {/* ENLACE CORREGIDO/SUGERIDO: 
+                Asegúrate de que la ruta "/proyectos-disponibles" 
+                esté configurada en App.jsx para renderizar VerPublicacionesFreelancer.jsx 
+                (o el componente que muestra todos los proyectos publicados por clientes).
+            */}
             <li><Link to="/proyectos-disponibles">Ver Proyectos</Link></li>
             <li><Link to="/como-funciona">¿Cómo Funciona?</Link></li>
             <li><Link to="/blog">Nuestro Blog</Link></li> 

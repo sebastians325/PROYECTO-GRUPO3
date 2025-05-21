@@ -1,44 +1,44 @@
 const express = require('express');
 const router = express.Router();
-const { publicaciones, usuarios, postulaciones } = require('../models'); 
+const { publicaciones, usuarios, postulaciones } = require('../models');
 
+// Crear publicación (cliente)
 router.post("/", async (req, res) => {
-    const { titulo, descripcion, usuarioId, pago } = req.body; 
+    const { titulo, descripcion, usuarioId, pago } = req.body; // <-- Asegúrate de incluir "pago"
     try {
         const nuevaPublicacion = await publicaciones.create({
             titulo,
             descripcion,
             usuarioId,
-            pago 
+            pago // <-- Incluye pago aquí
         });
         res.status(201).json(nuevaPublicacion);
     } catch (error) {
-        console.error("Error al crear la publicación:", error);
-        res.status(500).json({ error: "Error al crear la publicación", details: error.message });
+        res.status(500).json({ error: "Error al crear la publicación", details: error });
     }
 });
 
 // Ver publicaciones (cliente o freelancer)
 router.get("/", async (req, res) => {
-    const { usuarioId } = req.query; 
+    const { usuarioId } = req.query;
+
     try {
-        const whereClause = usuarioId ? { usuarioId: parseInt(usuarioId) } : {}; 
+        const whereClause = usuarioId ? { usuarioId } : {};
 
         const listaPublicaciones = await publicaciones.findAll({
             where: whereClause,
             include: [
                 {
                     model: usuarios,
-                    as: "cliente", 
+                    as: "cliente",
                     attributes: ['id', 'nombre', 'apellido']
                 }
-            ],
-            order: [['createdAt', 'DESC']] 
+            ]
         });
+
         res.json(listaPublicaciones);
     } catch (error) {
-        console.error("Error al obtener publicaciones:", error);
-        res.status(500).json({ error: "Error al obtener publicaciones", details: error.message });
+        res.status(500).json({ error: "Error al obtener publicaciones", details: error });
     }
 });
 
@@ -47,7 +47,7 @@ router.get("/:id/candidatos", async (req, res) => {
     const publicacionId = req.params.id;
     try {
         const listaCandidatos = await postulaciones.findAll({
-            where: { publicacionId: parseInt(publicacionId) }, 
+            where: { publicacionId },
             include: [{
                 model: usuarios,
                 as: "freelancer",
@@ -56,72 +56,34 @@ router.get("/:id/candidatos", async (req, res) => {
         });
         res.json(listaCandidatos);
     } catch (error) {
-        console.error("Error al obtener candidatos:", error);
-        res.status(500).json({ error: "Error al obtener candidatos", details: error.message });
+        res.status(500).json({ error: "Error al obtener candidatos", details: error });
     }
 });
-
-router.put("/:id", async (req, res) => {
-    const publicacionId = req.params.id;
-    const { estado: nuevoEstado } = req.body; // Obtiene el nuevo estado del cuerpo de la solicitud
-
-    // Validación básica del nuevo estado 
-    const estadosPermitidos = ['abierto', 'en_proceso', 'cerrado'];
-    if (!nuevoEstado || !estadosPermitidos.includes(nuevoEstado)) {
-        return res.status(400).json({ error: "Estado no válido proporcionado." });
-    }
-
-    try {
-        const publicacion = await publicaciones.findByPk(parseInt(publicacionId));
-
-        if (!publicacion) {
-            return res.status(404).json({ error: "Publicación no encontrada." });
-        }
-
-        publicacion.estado = nuevoEstado;
-        await publicacion.save(); // Guarda los cambios en la base de datos
-
-        res.json({ mensaje: "Estado de la publicación actualizado correctamente.", publicacion });
-
-    } catch (error) {
-        console.error("Error al actualizar el estado de la publicación:", error);
-        res.status(500).json({ error: "Error interno del servidor al actualizar el estado", details: error.message });
-    }
-});
-
-
+// Desde cliente, cerrar publicación al aceptar mensaje
 router.put("/:id/cerrar", async (req, res) => {
     try {
-        const publicacionId = req.params.id;
-        const publicacion = await publicaciones.findByPk(parseInt(publicacionId));
-        if (!publicacion) {
-            return res.status(404).json({ error: "Publicación no encontrada." });
-        }
-        publicacion.estado = 'cerrado';
-        await publicacion.save();
-        res.json({ mensaje: "Publicación cerrada correctamente." });
+        await publicaciones.update({ estado: 'cerrado' }, { where: { id: req.params.id } });
+        res.json({ mensaje: "Publicación cerrada" });
     } catch (error) {
-        console.error("Error al cerrar publicación:", error);
-        res.status(500).json({ error: "Error al cerrar publicación", details: error.message });
+        res.status(500).json({ error: "Error al cerrar publicación", details: error });
     }
 });
-
+// Freelancer envía mensaje al cliente
 router.put("/:id/mensaje", async (req, res) => {
-    const postulacionId = req.params.id;
     const { mensaje } = req.body;
     try {
-        const postulacion = await postulaciones.findByPk(parseInt(postulacionId));
+        const postulacion = await postulaciones.findByPk(req.params.id);
         if (!postulacion) return res.status(404).json({ error: "Postulación no encontrada" });
 
-        postulacion.mensajeRespuesta = mensaje; 
+        postulacion.mensajeRespuesta = mensaje;
         await postulacion.save();
 
         res.json({ mensaje: "Mensaje enviado correctamente." });
     } catch (error) {
-        console.error("Error al enviar mensaje:", error);
-        res.status(500).json({ error: "Error al enviar mensaje", details: error.message });
+        res.status(500).json({ error: "Error al enviar mensaje", details: error });
     }
 });
 
 
 module.exports = router;
+
