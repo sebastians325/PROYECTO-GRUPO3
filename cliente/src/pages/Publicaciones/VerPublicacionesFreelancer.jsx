@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import './VerPublicacionesFreelancer.css'; 
 import { Link } from 'react-router-dom'; 
 
-
 const VerPublicacionesFreelancer = () => {
   const [publicaciones, setPublicaciones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

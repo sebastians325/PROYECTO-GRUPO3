@@ -1,4 +1,3 @@
-//Publicaciones/DashboardFreelancer.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom'; 
 import './DashboardFreelancer.css'; 
