@@ -1,21 +1,23 @@
 const facade = require('../facades/PublicacionFacade');
+const PublicacionDTO = require('../dtos/publicacion.dto');
 
 exports.crear = async (req, res) => {
-  try {
-    const nueva = await facade.crearPublicacion(req.body);
-    res.status(201).json(nueva);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        const publicacionData = PublicacionDTO.fromRequest(req.body);
+        const nueva = await facade.crearPublicacion(publicacionData);
+        res.status(201).json(PublicacionDTO.toResponse(nueva));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 exports.listar = async (req, res) => {
-  try {
-    const publicaciones = await facade.listarPublicaciones(req.query);
-    res.json(publicaciones);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    try {
+        const publicaciones = await facade.listarPublicaciones(req.query);
+        res.json(PublicacionDTO.toList(publicaciones));
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 
 exports.verCandidatos = async (req, res) => {
