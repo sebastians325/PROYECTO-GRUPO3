@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './RegisterPage.css';
-import Pie from '../../ComponentesGeneral/footer'; // Asegúrate que la ruta sea correcta
 
 const RegisterPage = () => {
     // --- ESTADO CORREGIDO ---

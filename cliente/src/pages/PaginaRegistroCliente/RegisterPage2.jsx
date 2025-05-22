@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import './RegisterPage2.css'; // Asegúrate que la ruta sea correcta
-import Pie from '../../ComponentesGeneral/footer';
+import './RegisterPage2.css'; 
 
 const RegisterPageCliente = () => {
     // --- ESTADO (SIN especialidad, SIN role, SIN bio) ---
