@@ -1,19 +1,31 @@
-const facade = require('../facades/PostulacionFacade');
+const PostulacionFacade = require('../facades/PostulacionFacade');
+const PostulacionDTO = require('../dtos/postulacion.dto.js');
+const { BaseController } = require('./base.controller');
 
-exports.crearPostulacion = async (req, res) => {
-  try {
-    const nueva = await facade.crear(req.body);
-    res.status(201).json(nueva);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+class PostulacionesController extends BaseController {
+    constructor() {
+        super();
+        this.facade = PostulacionFacade;
+    }
 
-exports.aceptarPostulante = async (req, res) => {
-  try {
-    const result = await facade.aceptar(req.params.id);
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+    async crearPostulacion(req, res) {
+        try {
+            const postulacionData = PostulacionDTO.fromRequest(req.body);
+            const nueva = await this.facade.crear(postulacionData);
+            return this.created(res, PostulacionDTO.toResponse(nueva));
+        } catch (err) {
+            return this.handleError(res, err);
+        }
+    }
+
+    async aceptarPostulante(req, res) {
+        try {
+            const result = await this.facade.aceptar(req.params.id);
+            return this.success(res, PostulacionDTO.toResponse(result));
+        } catch (err) {
+            return this.handleError(res, err);
+        }
+    }
+}
+
+module.exports = new PostulacionesController();

@@ -1,19 +1,18 @@
 const service = require('../services/usuarios.service');
-const { generateToken } = require('../utils/jwt');
-const { comparePassword } = require('../utils/password');
+const { generateToken } = require('../middleware/utils/jwt');
+const { comparePassword } = require('../middleware/utils/password');
 
 class AuthFacade {
-  // Registro de freelancer
+
   async registrarFreelancer(data) {
     return await service.crearConRol(data, "freelancer");
   }
 
-  // Registro de cliente
+
   async registrarCliente(data) {
     return await service.crearConRol(data, "cliente");
   }
 
-  // Login
   async login({ correo, password }) {
     if (!correo || !password) {
       throw { status: 400, message: 'Correo y contraseña requeridos.' };

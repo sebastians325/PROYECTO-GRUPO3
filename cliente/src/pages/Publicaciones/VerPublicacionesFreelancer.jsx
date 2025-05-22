@@ -34,6 +34,16 @@ const VerPublicacionesFreelancer = () => {
   }, []);
 
   const handlePostular = async (publicacionId) => {
+    const publicacion = publicaciones.find(p => p.id === publicacionId);
+    
+    if (publicacion.estado !== 'abierto') {
+      setPostulacionFeedback(prev => ({
+        ...prev,
+        [publicacionId]: { type: 'error', message: 'Esta publicación no está disponible para postulaciones.' }
+      }));
+      return;
+    }
+
     if (!currentUser || currentUser.role !== 'freelancer') {
       setPostulacionFeedback(prev => ({
         ...prev,
@@ -113,10 +123,13 @@ const VerPublicacionesFreelancer = () => {
                 {currentUser ? (
                   <button
                     onClick={() => handlePostular(pub.id)}
-                    className="button"
-                    disabled={isPostulando || yaPostulado}
+                    className={`button ${pub.estado !== 'abierto' ? 'button-disabled' : ''}`}
+                    disabled={isPostulando || yaPostulado || pub.estado !== 'abierto'}
                   >
-                    {isPostulando ? 'Procesando...' : yaPostulado ? 'Postulado ✓' : 'Postularme'}
+                    {isPostulando ? 'Procesando...' : 
+                     yaPostulado ? 'Postulado ✓' : 
+                     pub.estado !== 'abierto' ? 'No disponible' : 
+                     'Postularme'}
                   </button>
                 ) : (
                   <Link to="/publicaciones/login" className="button button-login-prompt">

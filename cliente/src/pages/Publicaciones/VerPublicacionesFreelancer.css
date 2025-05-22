@@ -162,11 +162,16 @@
    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+.button-disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
 .button:disabled {
-  background-color: #FFCDD2; 
-  color: #EF9A9A; 
-  cursor: not-allowed;
-  box-shadow: none;
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
 }
 
 .feedbackMessageBase {

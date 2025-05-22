@@ -1,8 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/postulaciones.controller');
+const router = require('express').Router();
+const PostulacionesController = require('../controllers/postulaciones.controller');
+const { validatePostulacion } = require('../middleware/validators/postulacion.validator');
 
-router.post('/', controller.crearPostulacion);
-router.put('/:id/aceptar', controller.aceptarPostulante);
+router.post('/', 
+    validatePostulacion,
+    PostulacionesController.crearPostulacion.bind(PostulacionesController)
+);
+
+router.put('/:id/aceptar',
+    PostulacionesController.aceptarPostulante.bind(PostulacionesController)
+);
 
 module.exports = router;
