@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { ClienteService } from '../../services/ClienteService';
 // Se importa el archivo CSS específico para este dashboard.
 // Los estilos definidos aquí son responsables de la apariencia visual de este componente.
 import './DashboardCliente.css'; 
@@ -56,144 +57,78 @@ function DashboardCliente() {
   // Este 'useEffect' se activa cuando la información del 'user' está disponible o cambia.
   // Se encarga de realizar las llamadas a la API para obtener los datos necesarios para el dashboard.
   useEffect(() => {
-    // Si no hay información del usuario, no se procede con la obtención de datos.
-    if (!user) return;
+  if (!user) return;
+  async function fetchData() {
+    setLoading(true);
+    setError('');
+    try {
+      const publicacionesData = await ClienteService.fetchPublicaciones(user.id);
+      setPublicaciones(publicacionesData);
 
-    async function fetchPublicacionesYPostulantes() {
-      setLoading(true); // Se activa el indicador de carga.
-      setError(''); // Se limpian errores previos.
-      try {
-        const token = localStorage.getItem('token');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`; // Se añade el token de autorización a los encabezados.
+      const postulantesData = {};
+      for (const pub of publicacionesData) {
+        try {
+          const postulantes = await ClienteService.fetchPostulantes(pub.id);
+          postulantesData[pub.id] = postulantes;
+        } catch (err) {
+          console.warn(err.message);
+          postulantesData[pub.id] = [];
         }
-
-        // Se obtienen las publicaciones del cliente, filtrando por 'usuarioId'.
-        const resPublicaciones = await fetch(`http://localhost:3001/publicaciones?usuarioId=${user.id}`, { headers }); 
-        if (!resPublicaciones.ok) { // Manejo de respuestas no exitosas de la API.
-            const errData = await resPublicaciones.json().catch(() => ({message: 'Error al obtener tus publicaciones'}));
-            throw new Error(errData.message);
-        }
-        const dataPublicaciones = await resPublicaciones.json();
-        setPublicaciones(dataPublicaciones); // Se guardan las publicaciones en el estado.
-
-        // Para cada publicación, se obtienen sus postulantes.
-        const postulantesData = {};
-        for (const pub of dataPublicaciones) { 
-          try {
-            const resPostulantes = await fetch(`http://localhost:3001/publicaciones/${pub.id}/candidatos`, { headers });
-            if (resPostulantes.ok) {
-              const postulantes = await resPostulantes.json();
-              postulantesData[pub.id] = postulantes; 
-            } else {
-              console.warn(`No se pudieron obtener postulantes para la publicación ${pub.id}. Estado: ${resPostulantes.status}`);
-              postulantesData[pub.id] = []; 
-            }
-          } catch (postulantesError) {
-            console.error(`Error obteniendo postulantes para pub ${pub.id}:`, postulantesError);
-            postulantesData[pub.id] = []; 
-          }
-        }
-        setPostulantesPorPublicacion(postulantesData); // Se guardan los postulantes en el estado.
-
-      } catch (err) { // Captura de errores durante el proceso de obtención de datos.
-        console.error("Error en fetchPublicacionesYPostulantes:", err);
-        setError(err.message || "Ocurrió un error al cargar los datos de tus publicaciones."); 
-      } finally {
-        setLoading(false); // Se desactiva el indicador de carga, independientemente del resultado.
       }
+      setPostulantesPorPublicacion(postulantesData);
+    } catch (err) {
+      setError(err.message || 'Error al cargar datos.');
+    } finally {
+      setLoading(false);
     }
-    fetchPublicacionesYPostulantes(); // Se llama a la función de obtención de datos.
-  }, [user]); // El efecto depende del estado 'user'.
+  }
+  fetchData();
+}, [user]);
 
   // --- Funciones Manejadoras de Acciones del Cliente ---
   // Estas funciones encapsulan la lógica para interactuar con el backend y actualizar el estado local.
 
   // Función para cambiar el estado de una publicación.
   const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError("Sesión no válida. Por favor, inicia sesión de nuevo."); 
-        return;
-      }
+  try {
+    await ClienteService.cambiarEstadoPublicacion(publicacionId, nuevoEstado);
+    setPublicaciones(prev => prev.map(pub =>
+      pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
+    ));
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
-      const res = await fetch(`http://localhost:3001/publicaciones/${publicacionId}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify({ estado: nuevoEstado }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ message: 'Error al actualizar estado de la publicación' }));
-        throw new Error(errorData.message);
-      }
-
-      // Optimistic update: Actualiza el estado local inmediatamente para una mejor UX.
-      setPublicaciones(prevPublicaciones =>
-        prevPublicaciones.map(pub => 
-          pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
-        )
-      );
-    } catch (err) {
-      console.error("Error en cambiarEstadoPublicacion:", err);
-      setError(`Error al cambiar estado: ${err.message}`); 
-    }
-  };
 
   // Función para aceptar un postulante.
   const aceptarPostulante = async (postulacionId, publicacionId) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError("Sesión no válida. Por favor, inicia sesión de nuevo."); 
-        return;
-      }
+  try {
+    const publicacion = publicaciones.find(p => p.id === publicacionId);
+    if (!publicacion) throw new Error('Publicación no encontrada.');
 
-      const publicacionActual = publicaciones.find(p => p.id === publicacionId);
-      if (!publicacionActual) {
-        setError("Error interno: No se encontró la publicación asociada.");
-        throw new Error("No se encontró la publicación para aceptar al postulante.");
-      }
+    await ClienteService.aceptarPostulante(postulacionId);
 
-      const res = await fetch(`http://localhost:3001/postulaciones/${postulacionId}/aceptar`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json', 
-          'Authorization': `Bearer ${token}` 
-        }
-      });
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ message: 'Error al aceptar el postulante' }));
-        throw new Error(errorData.message);
-      }
+    const updatedPostulantes = (postulantesPorPublicacion[publicacionId] || []).map(p =>
+      p.id === postulacionId
+        ? { ...p, estado: 'aceptado' }
+        : { ...p, estado: (p.estado === 'pendiente' && publicacion.estado === 'abierto') ? 'rechazado' : p.estado }
+    );
 
-      // Actualización optimista de los estados locales.
-      const updatedPostulantes = (postulantesPorPublicacion[publicacionId] || []).map(p => 
-        p.id === postulacionId 
-          ? { ...p, estado: 'aceptado' } 
-          : { ...p, estado: (p.estado === 'pendiente' && publicacionActual.estado === 'abierto') ? 'rechazado' : p.estado } 
-      );
-      setPostulantesPorPublicacion(prev => ({
-        ...prev,
-        [publicacionId]: updatedPostulantes,
-      }));
+    setPostulantesPorPublicacion(prev => ({
+      ...prev,
+      [publicacionId]: updatedPostulantes,
+    }));
 
-      setPublicaciones(prevPublicaciones =>
-        prevPublicaciones.map(pub =>
-          pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
-        )
-      );
-      alert('Postulante aceptado exitosamente. La publicación ahora está "en proceso".');
-    } catch (err) {
-      console.error("Error en aceptarPostulante:", err);
-      setError(`Error al aceptar postulante: ${err.message}`); 
-    }
-  };
+    setPublicaciones(prev => prev.map(pub =>
+      pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
+    ));
+
+    alert('Postulante aceptado exitosamente.');
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   // Función para cerrar la sesión.
   const handleLogout = () => { 
