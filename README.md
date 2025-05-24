@@ -16,5 +16,6 @@
 *     npm install
 *     npm start
 
+Nota: instalar las dependencias -> npm install bcrypt cors express jsonwebtoken nodemon pg pg-hstore pg-protocol postgres react-router-dom sequelize sequelize-cli web-vitals axios dotenv express-validator nodemon react-icons react-scripts
 
 considerar que el correo se debe registrar e ingresar en minuscula en todos lo casos
