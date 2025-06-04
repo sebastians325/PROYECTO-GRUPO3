@@ -334,3 +334,45 @@
   font-style: italic;
   background-color: rgba(0,0,0,0.1); 
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-contenido {
+  background-color: #fff;
+  color: #333;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.modal-contenido h3 {
+  margin-top: 0;
+}
+
+.modal-contenido textarea {
+  width: 100%;
+  min-height: 80px;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.modal-contenido input[type="range"] {
+  width: 100%;
+  margin: 10px 0;
+}
