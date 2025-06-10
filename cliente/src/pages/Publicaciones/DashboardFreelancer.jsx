@@ -59,6 +59,13 @@ function DashboardFreelancer() {
               <h3>Ver Publicaciones Disponibles</h3>
               <p>Explora todas las oportunidades y postúlate a los proyectos que te interesen.</p>
             </Link>
+            <Link 
+              to={`/mensajesF/${freelancer.id}`} 
+              className="action-card prominent-action-card"
+            >
+              <h3>Mensajes</h3>
+              <p>Explora todas las oportunidades y postúlate a los proyectos que te interesen.</p>
+            </Link>
           </div>
         </section>
         

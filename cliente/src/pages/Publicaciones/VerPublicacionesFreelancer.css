@@ -48,13 +48,7 @@
 
 .publicationsGrid {
   display: grid;
-  /* CAMBIO CLAVE: Forzar 2 columnas. 
-     Cada columna tomará una fracción igual del espacio disponible. */
   grid-template-columns: repeat(2, 1fr); 
-  /* Si prefieres que las tarjetas tengan un tamaño mínimo y se ajusten, 
-     podrías usar algo como: grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
-     Ajusta 450px según el ancho deseado para que generalmente resulten 2 columnas.
-  */
   gap: 30px; 
   max-width: 1200px; 
   margin: 0 auto; 
@@ -168,11 +162,16 @@
    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+.button-disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
 .button:disabled {
-  background-color: #FFCDD2; 
-  color: #EF9A9A; 
-  cursor: not-allowed;
-  box-shadow: none;
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
 }
 
 .feedbackMessageBase {

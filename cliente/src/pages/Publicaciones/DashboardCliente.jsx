@@ -1,178 +1,133 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { ClienteService } from '../../services/ClienteService';
+// Se importa el archivo CSS específico para este dashboard.
+// Los estilos definidos aquí son responsables de la apariencia visual de este componente.
 import './DashboardCliente.css'; 
 
+
 function DashboardCliente() {
+  
   const navigate = useNavigate();
+  
   const { id } = useParams(); 
+
   const [user, setUser] = useState(null); 
+
   const [publicaciones, setPublicaciones] = useState([]); 
   const [postulantesPorPublicacion, setPostulantesPorPublicacion] = useState({}); 
   const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(''); // Definición de setError
+  const [error, setError] = useState(''); 
 
+  
   useEffect(() => {
+    
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const token = localStorage.getItem('token'); 
     
+    
     if (!token || !storedUser || storedUser.role !== 'cliente' || storedUser.id !== parseInt(id)) {
-      localStorage.clear(); 
+      localStorage.clear(); // Si la validación falla, se limpia localStorage por seguridad.
       setError('Acceso no autorizado o sesión inválida. Por favor, inicia sesión de nuevo.'); 
-      navigate('/publicaciones/login'); 
+      navigate('/publicaciones/login'); // Se redirige al usuario a la página de login.
       return; 
     }
-    setUser(storedUser); 
-  }, [id, navigate]); 
+    setUser(storedUser); // Si todo es correcto, se establece la información del usuario en el estado.
+  }, [id, navigate]); // Las dependencias del efecto.
 
+  
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
+  async function fetchData() {
+    setLoading(true);
+    setError('');
+    try {
+      const publicacionesData = await ClienteService.fetchPublicaciones(user.id);
+      setPublicaciones(publicacionesData);
 
-    async function fetchPublicacionesYPostulantes() {
-      setLoading(true); 
-      setError(''); 
-      try {
-        const token = localStorage.getItem('token');
-        const headers = {
-          'Content-Type': 'application/json',
-        };
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+      const postulantesData = {};
+      for (const pub of publicacionesData) {
+        try {
+          const postulantes = await ClienteService.fetchPostulantes(pub.id);
+          postulantesData[pub.id] = postulantes;
+        } catch (err) {
+          console.warn(err.message);
+          postulantesData[pub.id] = [];
         }
-
-        const resPublicaciones = await fetch(`http://localhost:3001/publicaciones?usuarioId=${user.id}`, { headers }); 
-        if (!resPublicaciones.ok) {
-            const errData = await resPublicaciones.json().catch(() => ({message: 'Error al obtener tus publicaciones'}));
-            throw new Error(errData.message);
-        }
-        const dataPublicaciones = await resPublicaciones.json();
-        setPublicaciones(dataPublicaciones); 
-
-        const postulantesData = {};
-        for (const pub of dataPublicaciones) { 
-          try {
-            const resPostulantes = await fetch(`http://localhost:3001/publicaciones/${pub.id}/candidatos`, { headers });
-            if (resPostulantes.ok) {
-              const postulantes = await resPostulantes.json();
-              postulantesData[pub.id] = postulantes; 
-            } else {
-              console.warn(`No se pudieron obtener postulantes para la publicación ${pub.id}. Estado: ${resPostulantes.status}`);
-              postulantesData[pub.id] = []; 
-            }
-          } catch (postulantesError) {
-            console.error(`Error obteniendo postulantes para pub ${pub.id}:`, postulantesError);
-            postulantesData[pub.id] = []; 
-          }
-        }
-        setPostulantesPorPublicacion(postulantesData); 
-
-      } catch (err) {
-        console.error("Error en fetchPublicacionesYPostulantes:", err);
-        setError(err.message || "Ocurrió un error al cargar los datos de tus publicaciones."); 
-      } finally {
-        setLoading(false); 
       }
+      setPostulantesPorPublicacion(postulantesData);
+    } catch (err) {
+      setError(err.message || 'Error al cargar datos.');
+    } finally {
+      setLoading(false);
     }
-    fetchPublicacionesYPostulantes(); 
-  }, [user]); 
+  }
+  fetchData();
+}, [user]);
 
+  // --- Funciones Manejadoras de Acciones del Cliente ---
+  // Estas funciones encapsulan la lógica para interactuar con el backend y actualizar el estado local.
+
+  // Función para cambiar el estado de una publicación.
   const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError("Sesión no válida. Por favor, inicia sesión de nuevo."); 
-        return;
-      }
+  try {
+    await ClienteService.cambiarEstadoPublicacion(publicacionId, nuevoEstado);
+    setPublicaciones(prev => prev.map(pub =>
+      pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
+    ));
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
-      const res = await fetch(`http://localhost:3001/publicaciones/${publicacionId}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify({ estado: nuevoEstado }),
-      });
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ message: 'Error al actualizar estado de la publicación' }));
-        throw new Error(errorData.message);
-      }
-
-      setPublicaciones(prevPublicaciones =>
-        prevPublicaciones.map(pub => 
-          pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
-        )
-      );
-    } catch (err) {
-      console.error("Error en cambiarEstadoPublicacion:", err);
-      setError(`Error al cambiar estado: ${err.message}`); 
-    }
-  };
-
+  // Función para aceptar un postulante.
   const aceptarPostulante = async (postulacionId, publicacionId) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError("Sesión no válida. Por favor, inicia sesión de nuevo."); 
-        return;
-      }
+  try {
+    const publicacion = publicaciones.find(p => p.id === publicacionId);
+    if (!publicacion) throw new Error('Publicación no encontrada.');
 
-      // Obtener la publicación actual para acceder a su estado.
-      const publicacionActual = publicaciones.find(p => p.id === publicacionId);
-      if (!publicacionActual) {
-        setError("Error interno: No se encontró la publicación asociada.");
-        throw new Error("No se encontró la publicación para aceptar al postulante.");
-      }
+    await ClienteService.aceptarPostulante(postulacionId);
 
-      const res = await fetch(`http://localhost:3001/postulaciones/${postulacionId}/aceptar`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json', 
-          'Authorization': `Bearer ${token}` 
-        }
-      });
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ message: 'Error al aceptar el postulante' }));
-        throw new Error(errorData.message);
-      }
+    const updatedPostulantes = (postulantesPorPublicacion[publicacionId] || []).map(p =>
+      p.id === postulacionId
+        ? { ...p, estado: 'aceptado' }
+        : { ...p, estado: (p.estado === 'pendiente' && publicacion.estado === 'abierto') ? 'rechazado' : p.estado }
+    );
 
-      const updatedPostulantes = (postulantesPorPublicacion[publicacionId] || []).map(p => 
-        p.id === postulacionId 
-          ? { ...p, estado: 'aceptado' } 
-          : { ...p, estado: (p.estado === 'pendiente' && publicacionActual.estado === 'abierto') ? 'rechazado' : p.estado } 
-      );
-      setPostulantesPorPublicacion(prev => ({
-        ...prev,
-        [publicacionId]: updatedPostulantes,
-      }));
+    setPostulantesPorPublicacion(prev => ({
+      ...prev,
+      [publicacionId]: updatedPostulantes,
+    }));
 
-      setPublicaciones(prevPublicaciones =>
-        prevPublicaciones.map(pub =>
-          pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
-        )
-      );
-      alert('Postulante aceptado exitosamente. La publicación ahora está "en proceso".');
-    } catch (err) {
-      console.error("Error en aceptarPostulante:", err);
-      setError(`Error al aceptar postulante: ${err.message}`); 
-    }
-  };
+    setPublicaciones(prev => prev.map(pub =>
+      pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
+    ));
 
+    alert('Postulante aceptado exitosamente.');
+  } catch (err) {
+    setError(err.message);
+  }
+};
+
+  // Función para cerrar la sesión.
   const handleLogout = () => { 
     localStorage.clear(); 
     navigate('/'); 
   };
 
-  // USO DE error para mostrar el mensaje
-  if (error && !loading) { 
+  // --- Renderizado Condicional para Estados de Carga y Error Globales ---
+  if (error && !loading && publicaciones.length === 0) { 
     return <div className="dashboard-error-container">{error}</div>;
   }
-  
-  if (!user) { 
+  if (!user) { // Si el usuario aún no se ha cargado/validado.
     return <div className="dashboard-loading">Cargando panel de Cliente...</div>;
   }
 
+  // --- Renderizado Principal del Dashboard del Cliente ---
   return (
     <div className="dashboard-cliente-container">
+      {/* -- Cabecera del Dashboard -- */}
       <header className="dashboard-header">
         <div className="container">
           <h1>Bienvenido, {user.nombre || 'Cliente'}</h1> 
@@ -180,31 +135,38 @@ function DashboardCliente() {
         </div>
       </header>
 
+      {/* -- Contenido Principal del Dashboard -- */}
       <main className="dashboard-content container">
+        {/* -- Barra de Acciones Principales -- */}
         <div className="dashboard-actions-bar">
           <Link to={`/publicaciones/crear/${user.id}`} className="btn btn-crear-publicacion">
             Crear Nueva Publicación
+          </Link>
+          <Link to={`/mensajes/${user.id}`} className="btn btn-crear-publicacion">
+            Mensajes{/* -- Esta parte sera para mensaje  -- */}
           </Link>
           <button onClick={handleLogout} className="btn btn-logout-dashboard">
             Cerrar Sesión
           </button>
         </div>
 
+        {/* -- Sección de "Mis Publicaciones" -- */}
+        {/* Esta sección es donde se renderizaría el componente 'PublicacionesCliente' si se extrajera. */}
         <section className="mis-publicaciones-section">
           <h2 className="section-title">Mis Publicaciones</h2>
           
           {loading && <p className="loading-message">Cargando tus publicaciones...</p>}
-
-          {/* Muestra el error si existe y no está cargando */}
           {!loading && error && <p className="error-message">{error}</p>} 
-
           {!loading && publicaciones.length === 0 && !error && (
             <p className="no-publications-message">Aún no has creado ninguna publicación. ¡Crea una ahora!</p>
           )}
 
           {!loading && publicaciones.length > 0 && (
+            // Contenedor para la cuadrícula de publicaciones.
             <div className="publicaciones-grid">
               {publicaciones.map(pub => ( 
+                // -- Tarjeta Individual de Publicación --
+                // Cada publicación se muestra en su propia tarjeta.
                 <div key={pub.id} className="publication-card">
                   <div className="publication-card-header">
                     <h3 className="publication-title">{pub.titulo}</h3>
@@ -230,6 +192,7 @@ function DashboardCliente() {
                     </select>
                   </div>
 
+                  {/* Sección de Postulantes para esta publicación */}
                   <div className="postulantes-section">
                     <h4 className="postulantes-title">Postulantes ({postulantesPorPublicacion[pub.id]?.length || 0}):</h4>
                     {(postulantesPorPublicacion[pub.id]?.length || 0) === 0 ? (

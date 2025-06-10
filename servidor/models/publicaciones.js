@@ -1,3 +1,4 @@
+//models/publicaciones.js
 module.exports = (sequelize, DataTypes) => {
     const publicaciones = sequelize.define("publicaciones", {
         titulo: {
@@ -13,14 +14,14 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 'abierto'
         },
         pago: {
-             type: DataTypes.FLOAT, // o DECIMAL, según tu caso
+             type: DataTypes.FLOAT,
             allowNull: false,
         },    
     });
 
     publicaciones.associate = (models) => {
         publicaciones.belongsTo(models.usuarios, {
-            foreignKey: "usuarioId", // el cliente que publica
+            foreignKey: "usuarioId",
             as: "cliente"
         });
         publicaciones.hasMany(models.postulaciones, {

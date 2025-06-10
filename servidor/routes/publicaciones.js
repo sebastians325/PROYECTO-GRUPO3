@@ -1,3 +1,4 @@
+//routes/Publicaciones.js
 const express = require('express');
 const router = express.Router();
 const { publicaciones, usuarios, postulaciones } = require('../models'); 
@@ -121,6 +122,24 @@ router.put("/:id/mensaje", async (req, res) => {
         console.error("Error al enviar mensaje:", error);
         res.status(500).json({ error: "Error al enviar mensaje", details: error.message });
     }
+});
+// Obtener publicaciones con mensajes iniciados por cliente
+router.get('/cliente/:clienteId/publicaciones', async (req, res) => {
+  try {
+    const publicacionesConMensajes = await publicaciones.findAll({
+      where: { usuarioId: req.params.clienteId },
+      include: [
+        {
+          model: mensajes,
+          required: true
+        }
+      ]
+    });
+
+    res.json(publicacionesConMensajes);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener publicaciones con mensajes', details: err.message });
+  }
 });
 
 

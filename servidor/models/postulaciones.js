@@ -1,3 +1,4 @@
+//models/postulciones.js
 module.exports = (sequelize, DataTypes) => {
 const postulaciones = sequelize.define("postulaciones", {
   estado: {
@@ -20,7 +21,8 @@ const postulaciones = sequelize.define("postulaciones", {
       as: "freelancer"
     });
     postulaciones.belongsTo(models.publicaciones, {
-      foreignKey: "publicacionId"
+      foreignKey: "publicacionId",
+      as: "publicacion"
     });
   };
 

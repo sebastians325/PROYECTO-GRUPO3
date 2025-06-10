@@ -1,10 +1,10 @@
 /* src/ComponentesGeneral/footer.css */
 
 .footer-container {
-  background-color: #3B3B3B; /* Fondo gris oscuro/carbón */
-  color: #EAEAEA; /* Texto principal del footer MÁS CLARO */
+  background-color: #3B3B3B;
+  color: #EAEAEA; 
   padding: 40px 30px 30px 30px; 
-  border-top: 4px solid #FF8E53; /* Borde superior Naranja Medio, como acento */
+  border-top: 4px solid #FF8E53;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   width: 100%; 
   box-sizing: border-box; 
@@ -16,21 +16,21 @@
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto; 
-  gap: 25px; /* Reducido un poco el gap */
-  margin-bottom: 25px; /* Espacio antes del .footer-bottom */
+  gap: 25px; 
+  margin-bottom: 25px; 
 }
 
 .footer-section {
   flex: 1;
-  min-width: 190px; /* Reducido ligeramente para más flexibilidad */
+  min-width: 190px; 
   margin-bottom: 20px; 
 }
 
 .footer-section h4 {
-  color: #FF8E53; /* Títulos de sección en Naranja Medio */
+  color: #FF8E53; 
   font-size: 1.15rem;
   margin-top: 0; 
-  margin-bottom: 18px; /* Aumentado un poco para más espacio después del título */
+  margin-bottom: 18px; 
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -47,8 +47,8 @@
 }
 
 .footer-section ul li a,
-.footer-brand-info p a { /* Aplicar también a enlaces dentro de párrafos en brand-info */
-  color: #FFD180; /* Naranja pastel MÁS CLARO para todos los enlaces */
+.footer-brand-info p a { 
+  color: #FFD180; 
   text-decoration: none;
   transition: color 0.2s ease-in-out, padding-left 0.2s ease-in-out;
   font-size: 0.95rem;
@@ -57,22 +57,22 @@
 
 .footer-section ul li a:hover,
 .footer-brand-info p a:hover {
-  color: #FFAB40; /* Naranja más brillante para el hover */
+  color: #FFAB40;
   padding-left: 5px;
 }
 
 .footer-brand-info .brand-name {
   font-size: 2rem;
   font-weight: bold;
-  color: #FF6B6B; /* Nombre de la marca en Rojo/Coral */
+  color: #FF6B6B; 
   margin-bottom: 12px;
 }
 
 .footer-brand-info .brand-tagline,
-.footer-brand-info p { /* Aplicar también a párrafos en brand-info, como el de copyright y terms */
+.footer-brand-info p { 
   font-size: 0.95rem;
-  color: #D0D0D0; /* Gris MÁS CLARO para eslogan y texto secundario */
-  margin-bottom: 10px; /* Ajustado */
+  color: #D0D0D0;
+  margin-bottom: 10px; 
 }
 
 .footer-social-media {
@@ -80,14 +80,14 @@
 }
 
 .footer-social-media a {
-  color: #FFD180; /* Naranja pastel MÁS CLARO */
+  color: #FFD180; 
   font-size: 1.8rem;
   margin-right: 20px;
   transition: color 0.2s ease-in-out, transform 0.2s ease;
 }
 
 .footer-social-media a:hover {
-  color: #FFAB40; /* Naranja más brillante */
+  color: #FFAB40; 
   transform: translateY(-2px) scale(1.1);
 }
 
@@ -96,7 +96,7 @@
   padding-top: 20px; 
   border-top: none; 
   font-size: 0.9rem;
-  color: #D0D0D0; /* Gris MÁS CLARO para texto de copyright */
+  color: #D0D0D0; 
 }
 
 .footer-bottom p {
@@ -104,13 +104,13 @@
 }
 
 .footer-bottom a {
-  color: #FFD180; /* Naranja pastel MÁS CLARO */
+  color: #FFD180; 
   text-decoration: none;
   font-weight: 500;
 }
 
 .footer-bottom a:hover {
-  color: #FFAB40; /* Naranja más brillante */
+  color: #FFAB40; 
   text-decoration: underline;
 }
 
