@@ -56,4 +56,31 @@ export const ClienteService = {
       throw new Error(errData.message);
     }
   },
+
+  async enviarReseña(publicacionId, comentario, calificacion) {
+    try {
+        const response = await fetch(`${API_BASE}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                publicacionId,
+                comentario,
+                calificacion,
+                usuarioId: JSON.parse(localStorage.getItem('user')).id
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al enviar la reseña');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+  },
 };
