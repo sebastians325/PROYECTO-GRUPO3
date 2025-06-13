@@ -33,19 +33,24 @@ const VerPublicacionesFreelancer = () => {
     }
   }, []);
 
-  const handlePostular = async (publicacionId, file) => {
-    if (!file) {
+  const handlePostular = async (publicacionId) => {
+    const publicacion = publicaciones.find(p => p.id === publicacionId);
+    
+    if (publicacion.estado !== 'abierto') {
       setPostulacionFeedback(prev => ({
         ...prev,
-        [publicacionId]: { type: 'error', message: 'Debes seleccionar un archivo PDF.' }
+        [publicacionId]: { type: 'error', message: 'Esta publicación no está disponible para postulaciones.' }
       }));
       return;
     }
 
-    const formData = new FormData();
-    formData.append("usuarioId", currentUser.id);
-    formData.append("publicacionId", publicacionId);
-    formData.append("cv", file);
+    if (!currentUser || currentUser.role !== 'freelancer') {
+      setPostulacionFeedback(prev => ({
+        ...prev,
+        [publicacionId]: { type: 'error', message: 'Debes iniciar sesión como freelancer para postularte.' }
+      }));
+      return;
+    }
 
     setPostulacionFeedback(prev => ({
       ...prev,
@@ -53,16 +58,10 @@ const VerPublicacionesFreelancer = () => {
     }));
 
     try {
-      const res = await fetch("http://localhost:3001/postulaciones/postular-con-cv", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!res.ok) throw new Error("Error al postularse");
-
+      await PublicacionesService.postularse(publicacionId, currentUser.id);
       setPostulacionFeedback(prev => ({
         ...prev,
-        [publicacionId]: { type: 'success', message: '¡Postulación con CV exitosa!' }
+        [publicacionId]: { type: 'success', message: '¡Postulación exitosa!' }
       }));
     } catch (err) {
       setPostulacionFeedback(prev => ({
@@ -112,12 +111,7 @@ const VerPublicacionesFreelancer = () => {
                   <p className="cardDescription">{pub.descripcion}</p>
                   <p className="cardInfoItem"><strong>Cliente:</strong> {pub.cliente?.nombre} {pub.cliente?.apellido}</p>
                   <p className="cardInfoItem"><strong>Pago:</strong> ${pub.pago}</p>
-                  <p className="cardInfoItem">
-                    <strong>Estado:</strong>{' '}
-                    <span className={`estadoBadgeBase ${pub.estado === 'abierto' ? 'estadoAbierto' : 'estadoOtro'}`}>
-                      {pub.estado}
-                    </span>
-                  </p>
+                  <p className="cardInfoItem"><strong>Estado:</strong> <span className={`estadoBadgeBase ${pub.estado === 'abierto' ? 'estadoAbierto' : 'estadoOtro'}`}>{pub.estado}</span></p>
                 </div>
 
                 {feedback && (
@@ -127,14 +121,16 @@ const VerPublicacionesFreelancer = () => {
                 )}
 
                 {currentUser ? (
-                  <>
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={(e) => handlePostular(pub.id, e.target.files[0])}
-                      disabled={isPostulando || yaPostulado || pub.estado !== 'abierto'}
-                    />
-                  </>
+                  <button
+                    onClick={() => handlePostular(pub.id)}
+                    className={`button ${pub.estado !== 'abierto' ? 'button-disabled' : ''}`}
+                    disabled={isPostulando || yaPostulado || pub.estado !== 'abierto'}
+                  >
+                    {isPostulando ? 'Procesando...' : 
+                     yaPostulado ? 'Postulado ✓' : 
+                     pub.estado !== 'abierto' ? 'No disponible' : 
+                     'Postularme'}
+                  </button>
                 ) : (
                   <Link to="/publicaciones/login" className="button button-login-prompt">
                     Inicia sesión como Freelancer
