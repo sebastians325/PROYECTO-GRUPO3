@@ -334,3 +334,14 @@
   font-style: italic;
   background-color: rgba(0,0,0,0.1); 
 }
+
+.cv-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: underline;
+}
+.cv-link:hover {
+  color: #0056b3;
+}
