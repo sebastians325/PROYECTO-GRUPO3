@@ -1,19 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import mensajeService from '../../services/mensajeService';
+import { ClienteService } from '../../services/ClienteService';
 
 const VerMensajeFree = () => {
   const { publicacionId } = useParams();
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [error, setError] = useState('');
-  
+  const [freelancerId, setFreelancerId] = useState(null);
 
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const clienteId = storedUser?.id;
 
-  
- const freelancerId = 4;
+  useEffect(() => {
+    const cargarPostulantes = async () => {
+      try {
+        const lista = await ClienteService.fetchPostulantes(publicacionId);
+        const aceptados = lista.filter(p => p.estado.toLowerCase() === 'aceptado');
+        if (aceptados.length > 0) {
+          setFreelancerId(aceptados[0].usuarioId);
+        } else {
+          setError('No hay postulantes aceptados para esta publicación.');
+        }
+      } catch (err) {
+        setError('Error al cargar postulantes aceptados');
+        console.error(err);
+      }
+    };
+
+    if (publicacionId) {
+      cargarPostulantes();
+    }
+  }, [publicacionId]);
 
   const cargarMensajes = async () => {
     try {
@@ -47,7 +66,7 @@ const VerMensajeFree = () => {
     };
 
     try {
-      await mensajeService.enviarMensajeDirecto(data); 
+      await mensajeService.enviarMensajeDirecto(data); // ✅ la que funciona
       setNuevoMensaje('');
       setError('');
       await cargarMensajes();
@@ -98,4 +117,4 @@ const VerMensajeFree = () => {
   );
 };
 
-export default VerMensajeFree
+export default VerMensajeFree;

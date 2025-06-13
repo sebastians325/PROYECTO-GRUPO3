@@ -1,5 +1,3 @@
-// services/mensajeService.js
-// services/mensajeService.js
 const API_URL = 'http://localhost:3001/mensajes';
 
 const mensajeService = {
@@ -23,9 +21,8 @@ const mensajeService = {
     return res.json();
   },
 
-  // Cliente inicia conversación con freelancer aceptado en publicación
+  // Crear mensaje (cliente inicia conversación)
   async crearMensaje(data) {
-    // data: { contenido, publicacionId, remitenteId, destinatarioId }
     const res = await fetch(`${API_URL}`, {
       method: 'POST',
       headers: this.getHeaders(),
@@ -34,18 +31,8 @@ const mensajeService = {
     return this.handleResponse(res, 'Error al crear el mensaje.');
   },
 
-  // Obtener mensajes (historial) de una publicación para un usuario dado
-  async obtenerMensajesPorPublicacion(publicacionId, usuarioId) {
-    // usuarioId en query para validar acceso
-    const res = await fetch(`${API_URL}/publicacion/${publicacionId}?usuarioId=${usuarioId}`, {
-      headers: this.getHeaders(),
-    });
-    return this.handleResponse(res, 'Error al obtener mensajes por publicación.');
-  },
-
-  // Freelancer o cliente responde en conversación existente
+  // Responder mensaje existente
   async responderMensaje(data) {
-    // data: { contenido, publicacionId, remitenteId, destinatarioId }
     const res = await fetch(`${API_URL}/responder`, {
       method: 'POST',
       headers: this.getHeaders(),
@@ -54,7 +41,15 @@ const mensajeService = {
     return this.handleResponse(res, 'Error al responder el mensaje.');
   },
 
-  // Cliente ve sus publicaciones (para mostrar botones nuevoMensaje y verMensajes)
+  // Obtener historial de mensajes por publicación
+  async obtenerMensajesPorPublicacion(publicacionId, usuarioId) {
+    const res = await fetch(`${API_URL}/publicacion/${publicacionId}?usuarioId=${usuarioId}`, {
+      headers: this.getHeaders(),
+    });
+    return this.handleResponse(res, 'Error al obtener mensajes por publicación.');
+  },
+
+  // Obtener publicaciones del cliente
   async obtenerPublicacionesCliente(clienteId) {
     const res = await fetch(`${API_URL}/cliente/${clienteId}/publicaciones`, {
       headers: this.getHeaders(),
@@ -62,7 +57,7 @@ const mensajeService = {
     return this.handleResponse(res, 'Error al obtener publicaciones del cliente.');
   },
 
-  // Freelancer ve sus postulaciones aceptadas (para mostrar botón verMensajes)
+  // Obtener postulaciones aceptadas del freelancer
   async obtenerPostulacionesAceptadas(freelancerId) {
     const res = await fetch(`${API_URL}/freelancer/${freelancerId}/postulaciones`, {
       headers: this.getHeaders(),
@@ -85,14 +80,16 @@ const mensajeService = {
     });
     return this.handleResponse(res, 'Error al obtener cliente de la publicación.');
   },
-};
-import axios from 'axios';
 
-export const obtenerMensajesPorPublicacion = async (publicacionId, usuarioId) => {
-  const response = await axios.get(`/api/mensajes/publicacion/${publicacionId}`, {
-    params: { usuarioId }
-  });
-  return response.data;
+  // Enviar mensaje directo entre usuarios (sin publicación)
+  async enviarMensajeDirecto(data) {
+    const res = await fetch(`${API_URL}/directo`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse(res, 'Error al enviar mensaje directo.');
+  },
 };
+
 export default mensajeService;
-

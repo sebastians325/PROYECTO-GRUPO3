@@ -33,7 +33,7 @@ function DashboardMensajesFreelancer() {
   );
 
   const handleVerMensaje = (publicacionId) => {
-    navigate(`/mensajes/ver/${publicacionId}`);
+    navigate(`/mensajes/verF/${publicacionId}`);
   };
 
   if (loading) return <p>Cargando postulaciones aceptadas...</p>;

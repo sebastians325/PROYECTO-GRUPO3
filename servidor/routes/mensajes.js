@@ -262,5 +262,36 @@ router.get('/publicacion/:publicacionId/cliente', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener cliente de la publicación.', details: err.message });
   }
 });
+// Comunicación directa entre usuarios (sin publicación asociada)
+router.post('/directo', async (req, res) => {
+  const { contenido, remitenteId, destinatarioId,publicacionId } = req.body;
 
-module.exports = router;
+  try {
+    const remitente = await usuarios.findByPk(remitenteId);
+    const destinatario = await usuarios.findByPk(destinatarioId);
+
+    if (!remitente || !destinatario) {
+      return res.status(400).json({ error: 'Remitente o destinatario no válido.' });
+    }
+
+    // Validar roles si quieres limitar (opcional)
+    if (remitenteId === destinatarioId) {
+      return res.status(400).json({ error: 'No puedes enviarte mensajes a ti mismo.' });
+    }
+
+    const mensaje = await mensajes.create({
+      contenido,
+      remitenteId,
+      destinatarioId,
+      publicacionId, 
+      estado: 'pendiente',
+    });
+
+    res.status(201).json({ mensaje: 'Mensaje enviado directamente', data: mensaje });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al enviar mensaje directo.', details: err.message });
+  }
+});
+
+module.exports = router; 

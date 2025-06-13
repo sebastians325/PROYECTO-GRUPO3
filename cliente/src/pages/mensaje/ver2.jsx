@@ -1,23 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { useParams } from 'react-router-dom';
 import mensajeService from '../../services/mensajeService';
+import { ClienteService } from '../../services/ClienteService';
 
-const VerMensajeFree = () => {
+const VerMensajeCliente = () => {
   const { publicacionId } = useParams();
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [error, setError] = useState('');
-  
+  const [freelancerId, setFreelancerId] = useState(null);
 
+  // Obtener cliente logueado desde localStorage
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const clienteId = storedUser?.id;
 
-  
- const freelancerId = 4;
+  // Cargar postulante aceptado (freelancer)
+  useEffect(() => {
+    const cargarPostulantes = async () => {
+      try {
+        const lista = await ClienteService.fetchPostulantes(publicacionId);
+        const aceptados = lista.filter(p => p.estado.toLowerCase() === 'aceptado');
+        if (aceptados.length > 0) {
+          setFreelancerId(aceptados[0].usuarioId);
+        } else {
+          setError('No hay postulantes aceptados para esta publicación.');
+        }
+      } catch (err) {
+        setError('Error al cargar postulantes aceptados');
+        console.error(err);
+      }
+    };
 
+    if (publicacionId) {
+      cargarPostulantes();
+    }
+  }, [publicacionId]);
+
+  // Cargar mensajes (solo cuando clienteId y freelancerId estén listos)
   const cargarMensajes = async () => {
     try {
-      const datos = await mensajeService.obtenerMensajesPorPublicacion(publicacionId, clienteId);
+      const datos = await mensajeService.obtenerMensajesPorPublicacion(publicacionId, freelancerId);
       setMensajes(datos);
     } catch (err) {
       console.error('Error al obtener mensajes:', err);
@@ -39,21 +61,42 @@ const VerMensajeFree = () => {
   const handleEnviar = async () => {
     if (!nuevoMensaje.trim() || !freelancerId) return;
 
+    const ultimoMensaje = mensajes[mensajes.length - 1];
+    const destinatarioId = mensajes.length === 0
+      ? freelancerId
+      : (clienteId === ultimoMensaje?.remitenteId
+          ? ultimoMensaje.destinatarioId
+          : ultimoMensaje.remitenteId);
+
     const data = {
       publicacionId,
       remitenteId: clienteId,
-      destinatarioId: freelancerId,
+      destinatarioId,
       contenido: nuevoMensaje.trim()
     };
 
     try {
-      await mensajeService.enviarMensajeDirecto(data); 
+      await mensajeService.crearMensaje(data);
       setNuevoMensaje('');
       setError('');
-      await cargarMensajes();
+      cargarMensajes();
     } catch (err) {
-      console.error('Error al enviar mensaje:', err);
-      setError(err.message || 'No se pudo enviar el mensaje');
+      const msg = err.response?.data?.error;
+
+      if (err.response?.status === 400 && msg?.includes('Ya existe una conversación')) {
+        try {
+          await mensajeService.responderMensaje(data);
+          setNuevoMensaje('');
+          setError('');
+          cargarMensajes();
+        } catch (err2) {
+          console.error('Error al responder:', err2);
+          setError(err2.response?.data?.error || 'No se pudo responder el mensaje');
+        }
+      } else {
+        console.error('Error al enviar:', err);
+        setError(msg || 'No se pudo enviar el mensaje');
+      }
     }
   };
 
@@ -98,4 +141,4 @@ const VerMensajeFree = () => {
   );
 };
 
-export default VerMensajeFree
+export default VerMensajeCliente;

@@ -3,18 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import mensajeService from '../../services/mensajeService';
 import { ClienteService } from '../../services/ClienteService';
 
-const CrearMensajeDirecto = () => {
+const CrearMensaje = () => {
   const { publicacionId } = useParams();
-  const navigate = useNavigate();
-
   const [contenido, setContenido] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
   const [postulantes, setPostulantes] = useState([]);
   const [destinatarioId, setDestinatarioId] = useState('');
-
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-  const remitenteId = storedUser?.id;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const cargarPostulantes = async () => {
@@ -24,29 +20,19 @@ const CrearMensajeDirecto = () => {
         setPostulantes(aceptados);
         if (aceptados.length > 0) setDestinatarioId(aceptados[0].usuarioId);
       } catch (err) {
-        setError('Error al cargar postulantes aceptados');
+        setError('Error al cargar postulantes');
       }
     };
-
-    if (publicacionId) {
-      cargarPostulantes();
-    }
+    cargarPostulantes();
   }, [publicacionId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!remitenteId || !destinatarioId) {
-      setError('Faltan datos del remitente o destinatario');
-      return;
-    }
-
     try {
-      await mensajeService.enviarMensajeDirecto({
-        contenido,
-        remitenteId,
-        destinatarioId,
+      await mensajeService.crearMensaje({
         publicacionId,
+        destinatarioId,
+        contenido,
       });
       setMensaje('Mensaje enviado exitosamente');
       setTimeout(() => navigate(`/mensajes`), 2000);
@@ -57,11 +43,27 @@ const CrearMensajeDirecto = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: 600, margin: 'auto' }}>
-      <h2>Enviar Mensaje Directo ({remitenteId} → {destinatarioId || '?'})</h2>
+      <h2>Crear Mensaje para Publicación #{publicacionId}</h2>
       {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <form onSubmit={handleSubmit}>
+        <label>
+          Destinatario:
+          <select
+            value={destinatarioId}
+            onChange={(e) => setDestinatarioId(e.target.value)}
+            required
+            style={{ display: 'block', marginBottom: '10px', marginTop: '5px' }}
+          >
+            {postulantes.map((postulante) => (
+              <option key={postulante.id} value={postulante.usuarioId}>
+                {postulante.freelancer?.nombre} {postulante.freelancer?.apellido}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <textarea
           placeholder="Escribe tu mensaje..."
           value={contenido}
@@ -75,4 +77,4 @@ const CrearMensajeDirecto = () => {
   );
 };
 
-export default CrearMensajeDirecto;
+export default CrearMensaje;
