@@ -1,19 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import mensajeService from '../../services/mensajeService';
+import { PublicacionesService } from '../../services/PublicacionesService';
 
 const VerMensajeFree = () => {
   const { publicacionId } = useParams();
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [error, setError] = useState('');
-  
+  const [freelancerId, setFreelancerId] = useState(null); // Cliente (dueño de la publicación)
 
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const clienteId = storedUser?.id;
 
-  
- const freelancerId = 4;
+  // Obtener cliente de la publicación (dueño)
+  useEffect(() => {
+    const fetchCliente = async () => {
+      try {
+        const cliente = await PublicacionesService.obtenerClienteDePublicacion(publicacionId);
+        setFreelancerId(cliente.id); // Este será el destinatario real
+      } catch (err) {
+        console.error('Error al obtener el creador de la publicación:', err);
+        setError('Error al obtener el creador de la publicación');
+      }
+    };
+
+    if (publicacionId) {
+      fetchCliente();
+    }
+  }, [publicacionId]);
 
   const cargarMensajes = async () => {
     try {
@@ -47,7 +62,7 @@ const VerMensajeFree = () => {
     };
 
     try {
-      await mensajeService.enviarMensajeDirecto(data); 
+      await mensajeService.enviarMensajeDirecto(data);
       setNuevoMensaje('');
       setError('');
       await cargarMensajes();
@@ -98,4 +113,4 @@ const VerMensajeFree = () => {
   );
 };
 
-export default VerMensajeFree
+export default VerMensajeFree;
