@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ClienteService } from '../../services/ClienteService';
 import './DashboardCliente.css'; 
+import NotificationModal from '../../Componentes1/NotificationModal';
 
 function DashboardCliente() {
   const navigate = useNavigate();
@@ -20,6 +21,10 @@ function DashboardCliente() {
   const [reseña, setReseña] = useState('');
   const [valoracion, setValoracion] = useState(3); 
   const [publicacionAReseñar, setPublicacionAReseñar] = useState(null);
+
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationType, setNotificationType] = useState('success');
 
   useEffect(() => {
 
@@ -84,32 +89,35 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
 
 
   const aceptarPostulante = async (postulacionId, publicacionId) => {
-  try {
-    const publicacion = publicaciones.find(p => p.id === publicacionId);
-    if (!publicacion) throw new Error('Publicación no encontrada.');
+    try {
+      await ClienteService.aceptarPostulante(postulacionId);
+      
+      // Update postulantes state
+      setPostulantesPorPublicacion(prev => ({
+        ...prev,
+        [publicacionId]: prev[publicacionId].map(post =>
+          post.id === postulacionId ? { ...post, estado: 'aceptado' } : post
+        )
+      }));
 
-    await ClienteService.aceptarPostulante(postulacionId);
+      // Update publicacion state
+      setPublicaciones(prev =>
+        prev.map(pub =>
+          pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
+        )
+      );
 
-    const updatedPostulantes = (postulantesPorPublicacion[publicacionId] || []).map(p =>
-      p.id === postulacionId
-        ? { ...p, estado: 'aceptado' }
-        : { ...p, estado: (p.estado === 'pendiente' && publicacion.estado === 'abierto') ? 'rechazado' : p.estado }
-    );
-
-    setPostulantesPorPublicacion(prev => ({
-      ...prev,
-      [publicacionId]: updatedPostulantes,
-    }));
-
-    setPublicaciones(prev => prev.map(pub =>
-      pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
-    ));
-
-    alert('Postulante aceptado exitosamente.');
-  } catch (err) {
-    setError(err.message);
-  }
-};
+      // Show notification instead of alert
+      setNotificationMessage('Postulante aceptado exitosamente');
+      setNotificationType('success');
+      setShowNotification(true);
+      
+    } catch (error) {
+      setNotificationMessage('Error al aceptar el postulante');
+      setNotificationType('error');
+      setShowNotification(true);
+    }
+  };
 
   const handleLogout = () => { 
     localStorage.clear(); 
@@ -140,10 +148,14 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
         )
       );
   
-      alert('¡Gracias por tu reseña!');
+      setNotificationMessage('¡Gracias por tu reseña!');
+      setNotificationType('success');
+      setShowNotification(true);
     } catch (err) {
       console.error('Error al enviar la reseña:', err);
-      setError('Error al enviar la reseña.');
+      setNotificationMessage('Error al enviar la reseña. Por favor, intente nuevamente.');
+      setNotificationType('error');
+      setShowNotification(true);
     }
   };
   
@@ -266,6 +278,13 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
     </div>
   </div>
 )}
+
+<NotificationModal 
+  isOpen={showNotification}
+  message={notificationMessage}
+  type={notificationType}
+  onClose={() => setShowNotification(false)}
+/>
 
     </div>
   );
