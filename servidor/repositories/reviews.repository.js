@@ -27,4 +27,5 @@ class ReviewRepository {
     }
 }
 
-module.exports = new ReviewRepository();
+// Export the class instead of an instance
+module.exports = ReviewRepository;
