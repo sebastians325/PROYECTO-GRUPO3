@@ -22,6 +22,9 @@ app.use("/postulaciones", postulacionesRouter);
 const mensajesRouter = require('./routes/mensajes');
 app.use("/mensajes", mensajesRouter);
 
+const publicacionesRouter1 = require('./routes/Publicaciones');
+app.use("/publicaciones", publicacionesRouter1);
+
 
 db.sequelize.sync().then(() => {
 
