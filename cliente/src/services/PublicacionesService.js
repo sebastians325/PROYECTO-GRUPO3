@@ -1,6 +1,5 @@
-// services/PublicacionesService.js
 const API_URL = 'http://localhost:3001/publicaciones';
-
+//FACADE servicio centralizado
 export const PublicacionesService = {
   async obtenerPublicacionesDisponibles() {
     const res = await fetch(API_URL);
@@ -39,8 +38,7 @@ export const PublicacionesService = {
 
     return await res.json();
   },
-
-  async obtenerPostulacionesPorUsuario(usuarioId) {
+    async obtenerPostulacionesPorUsuario(usuarioId) {
     const res = await fetch(`http://localhost:3001/postulaciones?usuarioId=${usuarioId}`);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -69,4 +67,6 @@ export const PublicacionesService = {
     }
     return await res.json(); // Devuelve el objeto del usuario cliente
   }
+
 };
+

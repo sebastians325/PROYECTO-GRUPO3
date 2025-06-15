@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express') 
 const app = express()
 const cors = require('cors')
@@ -22,6 +24,7 @@ app.use("/mensajes", mensajesRouter);
 
 const publicacionesRouter1 = require('./routes/Publicaciones');
 app.use("/publicaciones", publicacionesRouter1);
+
 
 db.sequelize.sync().then(() => {
 

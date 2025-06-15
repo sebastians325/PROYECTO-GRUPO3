@@ -1,4 +1,3 @@
-//models/publicaciones.js
 module.exports = (sequelize, DataTypes) => {
     const publicaciones = sequelize.define("publicaciones", {
         titulo: {
