@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
       as: "freelancer"
     });
     postulaciones.belongsTo(models.publicaciones, {
-      foreignKey: "publicacionId"
+      foreignKey: "publicacionId",
+      as: "publicacion"
     });
   };
 
