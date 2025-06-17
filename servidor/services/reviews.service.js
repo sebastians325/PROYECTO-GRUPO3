@@ -1,5 +1,5 @@
-const reviewRepository = require('../repositories/reviews.repository');
-
+const ReviewRepository = require('../repositories/reviews.repository');
+const reviewRepository = new ReviewRepository();
 class ReviewService {
     async createReview(reviewData) {
         try {

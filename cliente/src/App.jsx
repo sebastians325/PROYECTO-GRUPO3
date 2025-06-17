@@ -15,7 +15,7 @@ import DashboardFreelancer from './pages/Publicaciones/DashboardFreelancer';
 import PostularseComoFreelancer from './pages/Publicaciones/PostularseComoFreelancer';
 import Pie from './ComponentesGeneral/footer'; 
 import Header from './ComponentesGeneral/header';
-
+import HistorialTrabajosFreelancer from './pages/Publicaciones/HistorialTrabajosFreelancer';
 function App() {
   return (
     <div className="App"> 
@@ -33,6 +33,8 @@ function App() {
           <Route path="/dashboard/cliente/:id" element={<DashboardCliente />} />
           <Route path="/dashboard/freelancer/:id" element={<DashboardFreelancer />} /> 
           <Route path="/postulaciones" element={<PostularseComoFreelancer />} />
+          <Route path="/freelancer/historial/:id" element={<HistorialTrabajosFreelancer />} />
+
         </Routes>
       </main>
       <Pie /> 
