@@ -1,5 +1,4 @@
 // src/pages/clientes/DashboardMensajesCliente.jsx
- // src/pages/clientes/DashboardMensajesCliente.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ClienteService } from '../../services/ClienteService';
