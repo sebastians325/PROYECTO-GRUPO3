@@ -1,42 +1,33 @@
-const reviewRepository = require('../repositories/reviews.repository');
+const ReviewRepository = require('../repositories/reviews.repository');
 
 class ReviewService {
+    constructor() {
+        // Instantiate the repository
+        this.reviewRepository = new ReviewRepository();
+    }
+
+    async getAllReviews() {
+        try {
+            return await this.reviewRepository.findAll();
+        } catch (error) {
+            throw new Error(`Error al obtener las reseñas: ${error.message}`);
+        }
+    }
+
     async createReview(reviewData) {
         try {
             const { publicacionId, comentario, calificacion, usuarioId } = reviewData;
             
             if (!comentario || !calificacion || !publicacionId || !usuarioId) {
-                throw new Error('Todos los campos son requeridos');
+                throw new Error('Faltan datos requeridos');
             }
 
-            if (calificacion < 1 || calificacion > 5) {
-                throw new Error('La calificación debe estar entre 1 y 5');
-            }
-
-            return await reviewRepository.create({
-                comentario,
-                calificacion,
-                publicacionId,
-                usuarioId
-            });
+            return await this.reviewRepository.create(reviewData);
         } catch (error) {
-            throw new Error('Error in review service: ' + error.message);
-        }
-    }
-
-    async getAllReviews() {
-        try {
-            const reviews = await reviewRepository.findAll();
-            
-            if (!reviews) {
-                throw new Error('No se encontraron reseñas');
-            }
-
-            return reviews;
-        } catch (error) {
-            throw new Error('Error al obtener las reseñas: ' + error.message);
+            throw new Error(`Error al crear la reseña: ${error.message}`);
         }
     }
 }
 
+// Export a new instance of the service
 module.exports = new ReviewService();
