@@ -175,6 +175,9 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
           <Link to={`/publicaciones/crear/${user.id}`} className="btn btn-crear-publicacion">
             Crear Nueva Publicación
           </Link>
+          <Link to={`/mensajes/${user.id}`} className="btn btn-crear-publicacion">
+            Mensajes{/* -- Esta parte sera para mensaje  -- */}
+          </Link>
           <button onClick={handleLogout} className="btn btn-logout-dashboard">
             Cerrar Sesión
           </button>

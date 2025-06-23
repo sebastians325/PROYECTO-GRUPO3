@@ -55,7 +55,19 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'usuarioId',
       as: 'postulaciones' 
     });
+    
+    usuarios.hasMany(models.mensajes, {
+      foreignKey: 'remitenteId',
+      as: 'mensajesEnviados'
+    });
+
+    usuarios.hasMany(models.mensajes, {
+      foreignKey: 'destinatarioId',
+      as: 'mensajesRecibidos'
+    });
   };
 
   return usuarios;
 };
+
+
