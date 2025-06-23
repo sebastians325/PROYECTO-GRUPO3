@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const express = require('express') 
 const app = express()
 const cors = require('cors')
@@ -22,9 +20,8 @@ app.use("/postulaciones", postulacionesRouter);
 const mensajesRouter = require('./routes/mensajes');
 app.use("/mensajes", mensajesRouter);
 
-const publicacionesRouter1 = require('./routes/Publicaciones');
-app.use("/publicaciones", publicacionesRouter1);
-
+const reviewRoutes = require('./routes/reviews.routes');
+app.use('/reviews', reviewRoutes);
 
 db.sequelize.sync().then(() => {
 
