@@ -3,6 +3,7 @@ const { Review, usuarios } = require('../models');
 class ReviewRepository {
     async findAll() {
         try {
+            console.log('Repository: Finding all reviews');
             return await Review.findAll({
                 include: [{
                     model: usuarios,
@@ -12,7 +13,8 @@ class ReviewRepository {
                 order: [['createdAt', 'DESC']]
             });
         } catch (error) {
-            throw new Error(`Database connection failed: ${error.message}`);
+            console.error('Repository error:', error);
+            throw new Error(`Database error: ${error.message}`);
         }
     }
 
@@ -25,4 +27,5 @@ class ReviewRepository {
     }
 }
 
+// Export the class instead of an instance
 module.exports = ReviewRepository;
