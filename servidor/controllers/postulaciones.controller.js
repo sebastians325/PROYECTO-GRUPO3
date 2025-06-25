@@ -2,7 +2,7 @@ const PostulacionFacade = require('../facades/PostulacionFacade');
 const PostulacionDTO = require('../dtos/postulacion.dto.js');
 const { BaseController } = require('./base.controller');
 const { postulaciones } = require('../models'); // Importación directa para la creación con CV
-const getCVSignedUrl = require('../services/s3SignedUrl');
+const { uploadCV, getCVSignedUrl } = require('../services/s3Service');
 
 class PostulacionesController extends BaseController {
     constructor() {

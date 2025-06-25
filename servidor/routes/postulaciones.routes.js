@@ -2,8 +2,7 @@
 const router = require('express').Router();
 const PostulacionesController = require('../controllers/postulaciones.controller');
 const { validatePostulacion } = require('../middleware/validators/postulacion.validator');
-const uploadCV = require('../services/s3Uploader');
-const getCVSignedUrl = require('../services/s3SignedUrl'); // ✅ nuevo para ver CV
+const { uploadCV, getCVSignedUrl } = require('../services/s3Service');
 
 // Ruta tradicional con validación
 router.post('/', 

@@ -1,22 +1,16 @@
-// 📁 servidor/services/s3Uploader.js
+// 📁 servidor/services/s3Service.js
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const { S3Client } = require('@aws-sdk/client-s3');
-require('dotenv').config();
+const getS3Client = require('./s3Client');
 
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+const s3 = getS3Client();
 
 const uploadCV = multer({
   storage: multerS3({
     s3,
     bucket: process.env.AWS_BUCKET_NAME,
-    //acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (req, file, cb) => {
       const fileName = `cv_${Date.now()}_${file.originalname}`;
@@ -32,4 +26,16 @@ const uploadCV = multer({
   },
 });
 
-module.exports = uploadCV;
+const getCVSignedUrl = async (filename) => {
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: filename,
+  });
+
+  return await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
+};
+
+module.exports = {
+  uploadCV,
+  getCVSignedUrl,
+};
