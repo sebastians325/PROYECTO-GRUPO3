@@ -30,23 +30,28 @@ class PostulacionesController extends BaseController {
     }
 
     async postularConCV(req, res) {
-        try {
-            const { usuarioId, publicacionId } = req.body;
-            const cvUrl = req.file ? req.file.location : null;
+  try {
+    const { usuarioId, publicacionId } = req.body;
 
-            const nueva = await postulaciones.create({
-                usuarioId,
-                publicacionId,
-                cvUrl,
-                estado: 'pendiente'
-            });
-
-            return this.created(res, PostulacionDTO.toResponse(nueva));
-        } catch (err) {
-            console.error("Error al postular con CV:", err);
-            return this.handleError(res, err);
-        }
+    if (!usuarioId || !publicacionId) {
+      return res.status(400).json({ error: "Faltan campos requeridos." });
     }
+
+    const cvUrl = req.file ? req.file.location : null;
+
+    const nueva = await postulaciones.create({
+      usuarioId,
+      publicacionId,
+      cvUrl,
+      estado: 'pendiente'
+    });
+
+    return this.created(res, PostulacionDTO.toResponse(nueva));
+  } catch (err) {
+    console.error("Error al postular con CV:", err);
+    return this.handleError(res, err);
+  }
+}
 }
 
 module.exports = new PostulacionesController();

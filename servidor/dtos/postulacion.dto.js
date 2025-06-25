@@ -8,7 +8,8 @@ class PostulacionDTO {
             mensaje: postulacion.mensaje,
             usuarioId: postulacion.usuarioId,
             publicacionId: postulacion.publicacionId,
-            createdAt: postulacion.createdAt
+            createdAt: postulacion.createdAt,
+            cvUrl: postulacion.cvUrl // ✅ AGREGA ESTA LÍNEA
         };
 
         if (postulacion.freelancer) {

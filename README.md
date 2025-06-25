@@ -18,7 +18,7 @@
 
 5to paso
 *     (en carpeta servidor)
-*     npm npx sequelize-cli db:migrate
+*     npx sequelize-cli db:migrate
 
 Nota: instalar las dependencias -> npm install bcrypt cors express jsonwebtoken nodemon pg pg-hstore pg-protocol postgres react-router-dom sequelize sequelize-cli web-vitals axios dotenv express-validator nodemon react-icons react-scripts
 

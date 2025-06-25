@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const express = require('express') 
+const express = require('express')
 const app = express()
 const cors = require('cors')
 
@@ -27,9 +27,11 @@ app.use("/publicaciones", publicacionesRouter1);
 
 
 db.sequelize.sync().then(() => {
-
+  if (process.env.NODE_ENV !== 'test') {
     app.listen(3001, () => {
-        console.log("Servidor corriendo en puerto 3001")
-    })
+      console.log("Servidor corriendo en puerto 3001");
+    });
+  }
+});
 
-})
+module.exports = app; // ⬅️ Agrega esta línea
