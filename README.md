@@ -21,8 +21,12 @@
 *     (en carpeta servidor)
 *     npx sequelize-cli db:migrate
 
-6to paso
-*     psql -U postgres (con esto entras al usuario postgres)
+6to paso (para correr test)
+*     (en carpeta servidor)
+*     NODE_ENV=test npm test
+
+7mo paso (si es que sale error al correr test)
+*     psql -U postgres
 *     CREATE DATABASE "IS2_test";
 
 
