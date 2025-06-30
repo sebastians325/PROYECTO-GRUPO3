@@ -1,6 +1,7 @@
 # PROYECTO-GRUPO3
 1er paso:
 *     en pgAdmin crear una base de datos llamada IS2 con clave 12345678
+*     en pgAdmin crear una base de datos llamada IS2_test con clave 12345678
 
 2do paso:
 *     npm install express-validator
@@ -19,6 +20,11 @@
 5to paso
 *     (en carpeta servidor)
 *     npx sequelize-cli db:migrate
+
+6to paso
+*     psql -U postgres (con esto entras al usuario postgres)
+*     CREATE DATABASE "IS2_test";
+
 
 Nota: instalar las dependencias -> npm install bcrypt cors express jsonwebtoken nodemon pg pg-hstore pg-protocol postgres react-router-dom sequelize sequelize-cli web-vitals axios dotenv express-validator nodemon react-icons react-scripts
 

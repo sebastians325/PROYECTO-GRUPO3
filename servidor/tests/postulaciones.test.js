@@ -4,23 +4,23 @@ const db = require('../models');
 
 describe('POST /postulaciones/postular-con-cv', () => {
   beforeAll(async () => {
-    await db.sequelize.sync({ force: true }); // recrea todo
-    await db.usuarios.create({
-      id: 1,
-      nombre: "Test",
-      apellido: "User",
-      correo: "test@example.com",
-      password: "hashedpass",
-      role: "freelancer"
-    });
-    await db.publicaciones.create({
-      id: 1,
-      titulo: "Test Tarea",
-      descripcion: "Test Descripción",
-      pago: 100,
-      usuarioId: 1
-    });
+  await db.sequelize.sync({ force: true }); // 🔁 Re-crea todas las tablas limpias
+  await db.usuarios.create({
+    id: 1,
+    nombre: "Test",
+    apellido: "User",
+    correo: "test@example.com",
+    password: "hashedpass",
+    role: "freelancer"
   });
+  await db.publicaciones.create({
+    id: 1,
+    titulo: "Test Tarea",
+    descripcion: "Test Descripción",
+    pago: 100,
+    usuarioId: 1
+  });
+});
 
   afterAll(async () => {
     await db.sequelize.close();

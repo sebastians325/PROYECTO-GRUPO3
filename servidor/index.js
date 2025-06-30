@@ -26,12 +26,13 @@ const publicacionesRouter1 = require('./routes/Publicaciones');
 app.use("/publicaciones", publicacionesRouter1);
 
 
-db.sequelize.sync().then(() => {
+
   if (process.env.NODE_ENV !== 'test') {
-    app.listen(3001, () => {
-      console.log("Servidor corriendo en puerto 3001");
+    db.sequelize.sync().then(() => {
+      app.listen(3001, () => {
+        console.log("Servidor corriendo en puerto 3001");
+      });
     });
   }
-});
 
 module.exports = app; // ⬅️ Agrega esta línea
