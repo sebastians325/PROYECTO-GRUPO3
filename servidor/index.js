@@ -1,4 +1,6 @@
-const express = require('express') 
+require('dotenv').config();
+
+const express = require('express')
 const app = express()
 const cors = require('cors')
 
@@ -23,10 +25,18 @@ app.use("/mensajes", mensajesRouter);
 const reviewRoutes = require('./routes/reviews.routes');
 app.use('/reviews', reviewRoutes);
 
+const publicacionesRouter1 = require('./routes/Publicaciones');
+app.use("/publicaciones", publicacionesRouter1);
+
+const reviewRoutes = require('./routes/reviews.routes');
+app.use('/reviews', reviewRoutes);
+
 db.sequelize.sync().then(() => {
-
+  if (process.env.NODE_ENV !== 'test') {
     app.listen(3001, () => {
-        console.log("Servidor corriendo en puerto 3001")
-    })
+      console.log("Servidor corriendo en puerto 3001");
+    });
+  }
+});
 
-})
+module.exports = app; // ⬅️ Agrega esta línea
