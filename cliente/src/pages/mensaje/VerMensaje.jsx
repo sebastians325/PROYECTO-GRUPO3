@@ -66,7 +66,7 @@ const VerMensajeCliente = () => {
     };
 
     try {
-      await mensajeService.enviarMensajeDirecto(data); // ✅ la que funciona
+      await mensajeService.enviarMensajeDirecto(data);
       setNuevoMensaje('');
       setError('');
       await cargarMensajes();
