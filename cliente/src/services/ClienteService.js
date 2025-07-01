@@ -56,4 +56,57 @@ export const ClienteService = {
       throw new Error(errData.message);
     }
   },
+
+  async enviarReseña(publicacionId, comentario, calificacion) {
+    try {
+        const response = await fetch(`${API_BASE}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                publicacionId,
+                comentario,
+                calificacion,
+                usuarioId: JSON.parse(localStorage.getItem('user')).id
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al enviar la reseña');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+  },
+
+  async createReview(reviewData) {
+    const res = await fetch(`${API_BASE}/reviews`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(reviewData)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({ message: 'Error al crear reseña' }));
+      throw new Error(errData.message);
+    }
+    return await res.json();
+  },
+
+  async getReviews() {
+    const res = await fetch(`${API_BASE}/reviews`, {
+      headers: this.getHeaders()
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({ message: 'Error al obtener reseñas' }));
+      throw new Error(errData.message);
+    }
+    return await res.json();
+  }
 };
