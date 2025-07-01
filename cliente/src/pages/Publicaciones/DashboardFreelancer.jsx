@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom'; 
-import './DashboardFreelancer.css'; 
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import './DashboardFreelancer.css';
 
 function DashboardFreelancer() {
   const navigate = useNavigate();
   const { id } = useParams(); // Obtiene el ID de la URL, que debería ser el ID del freelancer
-  const [freelancer, setFreelancer] = useState(null); 
+  const [freelancer, setFreelancer] = useState(null);
   const [error, setError] = useState(''); // Para manejar y mostrar errores
 
   useEffect(() => {
@@ -13,11 +13,11 @@ function DashboardFreelancer() {
     const token = localStorage.getItem('token'); // Es buena práctica verificar también el token
 
     if (!token || !storedUser || storedUser.role !== 'freelancer' || storedUser.id !== parseInt(id)) {
-      localStorage.clear(); 
+      localStorage.clear();
       setError('Acceso no autorizado o sesión inválida. Por favor, inicia sesión de nuevo.'); // Establecer mensaje de error
-      navigate('/publicaciones/login'); 
+      navigate('/publicaciones/login');
     } else {
-      setFreelancer(storedUser); 
+      setFreelancer(storedUser);
     }
   }, [navigate, id]); // Dependencias del efecto
 
@@ -40,7 +40,7 @@ function DashboardFreelancer() {
     <div className="dashboard-freelancer-container">
       {/* Cabecera del Dashboard */}
       <header className="dashboard-header">
-        <div className="container"> 
+        <div className="container">
           <h1>Bienvenido, {freelancer.nombre || 'Freelancer'}!</h1>
           <p>Este es tu panel de freelancer. Desde aquí puedes ver las publicaciones disponibles.</p>
         </div>
@@ -50,10 +50,10 @@ function DashboardFreelancer() {
       <main className="dashboard-content container">
         {/* Sección para la Acción Principal */}
         <section className="main-action-section">
-          <div className="actions-grid single-action-grid">
-            {/* Tarjeta/Botón para "Ver Publicaciones Disponibles" */}
-            <Link 
-              to={`/publicaciones/ver/${freelancer.id}`} 
+          <div className="actions-grid">
+            {/* Tarjeta para Ver Publicaciones */}
+            <Link
+              to={`/publicaciones/ver/${freelancer.id}`}
               className="action-card prominent-action-card"
             >
               <h3>Ver Publicaciones Disponibles</h3>
@@ -66,9 +66,17 @@ function DashboardFreelancer() {
               <h3>Mensajes</h3>
               <p>Explora todas las oportunidades y postúlate a los proyectos que te interesen.</p>
             </Link>
+            {/* NUEVA tarjeta para Historial */}
+            <Link
+              to={`/freelancer/historial/${freelancer.id}`}
+              className="action-card"
+            >
+              <h3>Historial de Trabajos</h3>
+              <p>Consulta tus trabajos completados y las valoraciones recibidas.</p>
+            </Link>
           </div>
         </section>
-        
+
         {/* Sección para el Botón de Cerrar Sesión */}
         <div className="dashboard-logout-section">
           <button onClick={handleLogout} className="btn btn-logout">

@@ -25,6 +25,10 @@ app.use("/mensajes", mensajesRouter);
 const reviewRoutes = require('./routes/reviews.routes');
 app.use('/reviews', reviewRoutes);
 
+const historialRoutes = require('./routes/freelancer.routes');
+app.use('/historial', historialRoutes);
+
+
 const publicacionesRouter1 = require('./routes/Publicaciones');
 app.use("/publicaciones", publicacionesRouter1);
 

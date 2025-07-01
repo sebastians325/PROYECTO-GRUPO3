@@ -1,0 +1,53 @@
+.historial-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 40px 30px;
+  border-radius: 16px;
+  max-width: 1000px;
+  margin: 0 auto 60px auto;
+  color: #FFFFFF;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  backdrop-filter: blur(8px);
+}
+
+.historial-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+
+.historial-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.historial-table th,
+.historial-table td {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+.historial-table th {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.historial-table td {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.historial-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.loading-message,
+.no-results {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 40px;
+  color: #FFFFFF;
+}
