@@ -14,12 +14,12 @@
 
 4to paso
 *     (en carpeta servidor)
-*     npm install
-*     npm start
+*     npx sequelize-cli db:migrate
 
 5to paso
 *     (en carpeta servidor)
-*     npx sequelize-cli db:migrate
+*     npm install
+*     npm start
 
 6to paso (para correr test)
 *     (en carpeta servidor)
