@@ -28,6 +28,9 @@ app.use('/reviews', reviewRoutes);
 const publicacionesRouter1 = require('./routes/Publicaciones');
 app.use("/publicaciones", publicacionesRouter1);
 
+const freelancerRoutes = require('./routes/freelancer.routes');
+app.use('/api/freelancers', freelancerRoutes);
+
 
 
   if (process.env.NODE_ENV !== 'test') {

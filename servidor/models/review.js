@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         });
         Review.belongsTo(models.publicaciones, {
             foreignKey: "publicacionId"
+            
         });
     };
 
