@@ -4,7 +4,7 @@ const db = require('../models');
 
 describe('POST /postulaciones/postular-con-cv', () => {
   beforeAll(async () => {
-  await db.sequelize.sync({ force: true }); // 🔁 Re-crea todas las tablas limpias
+  await db.sequelize.sync({ force: true }); // Re-crea todas las tablas limpias
   await db.usuarios.create({
     id: 1,
     nombre: "Test",
