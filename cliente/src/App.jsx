@@ -46,9 +46,11 @@ function App() {
           <Route path="/mensajes/crearF/:publicacionId" element={<CrearMensajeF />} />
           <Route path="/mensajes/ver/:publicacionId" element={<VerMensaje />} />
           <Route path="/mensajes/verF/:publicacionId" element={<VerMensajeFree />} />
+          <Route path="/freelancers/:freelancerId/historial" element={<HistorialTrabajos />} />
+
         </Routes>
       </main>
-      <Chatbot /> {/* <-- AÑADE EL CHATBOT AQUÍ */}
+      <Chatbot /> {/* <-- AÑADIR EL CHATBOT */}
       <Pie /> 
     </div>
   );
