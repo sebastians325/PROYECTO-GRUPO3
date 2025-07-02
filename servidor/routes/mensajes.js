@@ -1,8 +1,15 @@
-//routes/mensajes.js
 const express = require('express');
 const router = express.Router();
-const { mensajes, publicaciones, usuarios, postulaciones, sequelize } = require('../models');
-// Obtener mensajes (historial) para publicación - orden cronológico
+const { usuarios, publicaciones, postulaciones, mensajes } = require('../models');
+ 
+const MessageService = require('../services/MessageService');
+const EmailSender = require('../services/EmailSender');
+const EmailNotificationMessageService = require('../decorators/EmailNotificationMessageService');
+ 
+const baseService = new MessageService();
+const emailSender = new EmailSender();
+const decoratedService = new EmailNotificationMessageService(baseService, emailSender, usuarios);
+
 router.get('/publicacion/:publicacionId', async (req, res) => {
   const { publicacionId } = req.params;
   const { usuarioId } = req.query; // id del usuario que solicita
@@ -133,33 +140,32 @@ router.get('/publicacion/:publicacionId/freelancer', async (req, res) => {
 
 // Comunicación directa entre usuarios 
 router.post('/directo', async (req, res) => {
-  const { contenido, remitenteId, destinatarioId,publicacionId } = req.body;
-
+  const { contenido, remitenteId, destinatarioId, publicacionId } = req.body;
+ 
   try {
     const remitente = await usuarios.findByPk(remitenteId);
     const destinatario = await usuarios.findByPk(destinatarioId);
-
+ 
     if (!remitente || !destinatario) {
       return res.status(400).json({ error: 'Remitente o destinatario no válido.' });
     }
-
-    // Validar roles si quieres limitar 
+ 
     if (remitenteId === destinatarioId) {
       return res.status(400).json({ error: 'No puedes enviarte mensajes a ti mismo.' });
     }
-
-    const mensaje = await mensajes.create({
+ 
+    const mensaje = await decoratedService.createMessage({
       contenido,
       remitenteId,
       destinatarioId,
-      publicacionId, 
+      publicacionId,
       estado: 'pendiente',
     });
-
-    res.status(201).json({ mensaje: 'Mensaje enviado directamente', data: mensaje });
+ 
+    res.status(201).json({ mensaje: 'Mensaje enviado y email notificado.', data: mensaje });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error al enviar mensaje directo.', details: err.message });
+    res.status(500).json({ error: 'Error al enviar mensaje.', details: err.message });
   }
 });
 
