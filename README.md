@@ -15,6 +15,7 @@
 4to paso
 *     (en carpeta servidor)
 *     npx sequelize-cli db:migrate
+*     npm install nodemailer
 
 5to paso
 *     (en carpeta servidor)
