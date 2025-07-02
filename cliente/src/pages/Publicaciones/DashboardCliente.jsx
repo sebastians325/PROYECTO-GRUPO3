@@ -9,12 +9,9 @@ function DashboardCliente() {
   const { id } = useParams(); 
 
   const [user, setUser] = useState(null); 
-  
   const [publicaciones, setPublicaciones] = useState([]); 
   const [postulantesPorPublicacion, setPostulantesPorPublicacion] = useState({}); 
-  
   const [loading, setLoading] = useState(true); 
-  
   const [error, setError] = useState(''); 
 
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -27,7 +24,6 @@ function DashboardCliente() {
   const [notificationType, setNotificationType] = useState('success');
 
   useEffect(() => {
-
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const token = localStorage.getItem('token'); 
     
@@ -41,58 +37,55 @@ function DashboardCliente() {
   }, [id, navigate]); 
 
   useEffect(() => {
-  if (!user) return;
-  async function fetchData() {
-    setLoading(true);
-    setError('');
-    try {
-      const publicacionesData = await ClienteService.fetchPublicaciones(user.id);
-      setPublicaciones(publicacionesData);
+    if (!user) return;
+    async function fetchData() {
+      setLoading(true);
+      setError('');
+      try {
+        const publicacionesData = await ClienteService.fetchPublicaciones(user.id);
+        setPublicaciones(publicacionesData);
 
-      const postulantesData = {};
-      for (const pub of publicacionesData) {
-        try {
-          const postulantes = await ClienteService.fetchPostulantes(pub.id);
-          postulantesData[pub.id] = postulantes;
-        } catch (err) {
-          console.warn(err.message);
-          postulantesData[pub.id] = [];
+        const postulantesData = {};
+        for (const pub of publicacionesData) {
+          try {
+            const postulantes = await ClienteService.fetchPostulantes(pub.id);
+            postulantesData[pub.id] = postulantes;
+          } catch (err) {
+            console.warn(err.message);
+            postulantesData[pub.id] = [];
+          }
         }
+        setPostulantesPorPublicacion(postulantesData);
+      } catch (err) {
+        setError(err.message || 'Error al cargar datos.');
+      } finally {
+        setLoading(false);
       }
-      setPostulantesPorPublicacion(postulantesData);
+    }
+    fetchData();
+  }, [user]);
+
+  const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
+    try {
+      if (nuevoEstado === 'cerrado') {
+        setPublicacionAReseñar(publicacionId);
+        setMostrarModal(true);
+        return;
+      }
+
+      await ClienteService.cambiarEstadoPublicacion(publicacionId, nuevoEstado);
+      setPublicaciones(prev => prev.map(pub =>
+        pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
+      ));
     } catch (err) {
-      setError(err.message || 'Error al cargar datos.');
-    } finally {
-      setLoading(false);
+      setError(err.message);
     }
-  }
-  fetchData();
-}, [user]);
-
-
-const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
-  try {
-    if (nuevoEstado === 'cerrado') {
-      setPublicacionAReseñar(publicacionId);
-      setMostrarModal(true);
-      return;
-    }
-
-    await ClienteService.cambiarEstadoPublicacion(publicacionId, nuevoEstado);
-    setPublicaciones(prev => prev.map(pub =>
-      pub.id === publicacionId ? { ...pub, estado: nuevoEstado } : pub
-    ));
-  } catch (err) {
-    setError(err.message);
-  }
-};
-
+  };
 
   const aceptarPostulante = async (postulacionId, publicacionId) => {
     try {
       await ClienteService.aceptarPostulante(postulacionId);
       
-      // Update postulantes state
       setPostulantesPorPublicacion(prev => ({
         ...prev,
         [publicacionId]: prev[publicacionId].map(post =>
@@ -100,18 +93,15 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
         )
       }));
 
-      // Update publicacion state
       setPublicaciones(prev =>
         prev.map(pub =>
           pub.id === publicacionId ? { ...pub, estado: 'en_proceso' } : pub
         )
       );
 
-      // Show notification instead of alert
       setNotificationMessage('Postulante aceptado exitosamente');
       setNotificationType('success');
       setShowNotification(true);
-      
     } catch (error) {
       setNotificationMessage('Error al aceptar el postulante');
       setNotificationType('error');
@@ -124,23 +114,14 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
     navigate('/'); 
   };
 
-  if (error && !loading && publicaciones.length === 0) { 
-    return <div className="dashboard-error-container">{error}</div>;
-  }
-  if (!user) { 
-    return <div className="dashboard-loading">Cargando panel de Cliente...</div>;
-  }
-
   const enviarReseña = async () => {
     try {
-
       await ClienteService.enviarReseña(publicacionAReseñar, reseña, valoracion);
   
       setMostrarModal(false);
       setReseña('');
       setValoracion(3);
   
-
       await ClienteService.cambiarEstadoPublicacion(publicacionAReseñar, 'cerrado');
       setPublicaciones(prev =>
         prev.map(pub =>
@@ -158,11 +139,28 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
       setShowNotification(true);
     }
   };
-  
 
+  // Función para ver CV
+  const verCV = async (cvUrl) => {
+    try {
+      const filename = cvUrl.split('/').pop();
+      const response = await ClienteService.obtenerCVUrl(filename);
+      window.open(response.url, '_blank');
+    } catch (error) {
+      console.error("Error al abrir CV:", error);
+    }
+  };
+
+  if (error && !loading && publicaciones.length === 0) { 
+    return <div className="dashboard-error-container">{error}</div>;
+  }
+  if (!user) { 
+    return <div className="dashboard-loading">Cargando panel de Cliente...</div>;
+  }
 
   return (
     <div className="dashboard-cliente-container">
+      {/* header y botones */}
       <header className="dashboard-header">
         <div className="container">
           <h1>Bienvenido, {user.nombre || 'Cliente'}</h1> 
@@ -176,7 +174,7 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
             Crear Nueva Publicación
           </Link>
           <Link to={`/mensajes/${user.id}`} className="btn btn-crear-publicacion">
-            Mensajes{/* -- Esta parte sera para mensaje  -- */}
+            Mensajes
           </Link>
           <button onClick={handleLogout} className="btn btn-logout-dashboard">
             Cerrar Sesión
@@ -234,6 +232,11 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
                                 (Estado: {post.estado})
                               </span>
                             </div>
+                            {post.cvUrl && (
+                              <button onClick={() => verCV(post.cvUrl)} className="btn btn-ver-cv">
+                                Ver CV
+                              </button>
+                            )}
                             {post.estado === 'pendiente' && pub.estado === 'abierto' && (
                               <button
                                 onClick={() => aceptarPostulante(post.id, pub.id)} 
@@ -242,8 +245,8 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
                                 Aceptar Freelancer
                               </button>
                             )}
-                             {post.estado === 'aceptado' && pub.estado === 'en_proceso' && (
-                                <span className="postulante-aceptado-badge">¡Contratado!</span>
+                            {post.estado === 'aceptado' && pub.estado === 'en_proceso' && (
+                              <span className="postulante-aceptado-badge">¡Contratado!</span>
                             )}
                           </li>
                         ))}
@@ -258,37 +261,36 @@ const cambiarEstadoPublicacion = async (publicacionId, nuevoEstado) => {
       </main>
 
       {mostrarModal && (
-  <div className="modal-overlay">
-    <div className="modal-contenido">
-      <h3>Deja una Reseña</h3>
-      <label>Comentario:</label>
-      <textarea
-        value={reseña}
-        onChange={e => setReseña(e.target.value)}
-        placeholder="¿Cómo fue tu experiencia con este freelancer?"
-      />
-      <label>Calificación:</label>
-      <input
-        type="range"
-        min="1"
-        max="5"
-        value={valoracion}
-        onChange={e => setValoracion(Number(e.target.value))}
-      />
-      <p>Valor: {valoracion} estrellas</p>
-      <button className="btn" onClick={enviarReseña}>Enviar Reseña</button>
-      <button className="btn btn-logout-dashboard" onClick={() => setMostrarModal(false)}>Cancelar</button>
-    </div>
-  </div>
-)}
+        <div className="modal-overlay">
+          <div className="modal-contenido">
+            <h3>Deja una Reseña</h3>
+            <label>Comentario:</label>
+            <textarea
+              value={reseña}
+              onChange={e => setReseña(e.target.value)}
+              placeholder="¿Cómo fue tu experiencia con este freelancer?"
+            />
+            <label>Calificación:</label>
+            <input
+              type="range"
+              min="1"
+              max="5"
+              value={valoracion}
+              onChange={e => setValoracion(Number(e.target.value))}
+            />
+            <p>Valor: {valoracion} estrellas</p>
+            <button className="btn" onClick={enviarReseña}>Enviar Reseña</button>
+            <button className="btn btn-logout-dashboard" onClick={() => setMostrarModal(false)}>Cancelar</button>
+          </div>
+        </div>
+      )}
 
-<NotificationModal 
-  isOpen={showNotification}
-  message={notificationMessage}
-  type={notificationType}
-  onClose={() => setShowNotification(false)}
-/>
-
+      <NotificationModal 
+        isOpen={showNotification}
+        message={notificationMessage}
+        type={notificationType}
+        onClose={() => setShowNotification(false)}
+      />
     </div>
   );
 }
