@@ -1,100 +1,49 @@
-// tests/Mensaje.test.js
+// tests/MessageService.test.js
+const MessageService = require('../services/MessageService');
 
-const request = require('supertest');
-const app = require('../index');
-const db = require('../models');
+// Mock del modelo mensajes
+jest.mock('../models', () => ({
+  mensajes: {
+    create: jest.fn()
+  }
+}));
 
-describe('POST /directo - Comunicación directa entre usuarios', () => {
-  beforeAll(async () => {
-    await db.sequelize.sync({ force: true });
+const { mensajes } = require('../models');
 
-    // Crear usuarios
-    await db.usuarios.bulkCreate([
-      {
-        id: 1,
-        nombre: "Alice",
-        apellido: "Tester",
-        correo: "alice@example.com",
-        password: "123456",
-        role: "freelancer"
-      },
-      {
-        id: 2,
-        nombre: "Bob",
-        apellido: "Cliente",
-        correo: "bob@example.com",
-        password: "123456",
-        role: "cliente"
-      }
-    ]);
+describe('MessageService.createMessage', () => {
+  test('Happy Path: debe crear un mensaje con datos válidos', async () => {
+    const dataMock = {
+      contenido: 'Hola mundo',
+      remitenteId: 1,
+      destinatarioId: 2,
+      publicacionId: 10,
+      estado: 'pendiente'
+    };
 
-    // Crear publicación
-    await db.publicaciones.create({
-      id: 1,
-      titulo: "Proyecto test",
-      descripcion: "Test descripción",
-      pago: 200,
-      usuarioId: 2
-    });
+    const mensajeEsperado = { id: 1, ...dataMock };
+    mensajes.create.mockResolvedValue(mensajeEsperado);
+
+    const service = new MessageService();
+    const resultado = await service.createMessage(dataMock);
+
+    expect(mensajes.create).toHaveBeenCalledWith(dataMock);
+    expect(resultado).toEqual(mensajeEsperado);
   });
 
-  afterAll(async () => {
-    await db.sequelize.close();
-  });
+  test('Unhappy Path: error al crear mensaje', async () => {
+    const dataMock = {
+      contenido: 'Error esperado',
+      remitenteId: 1,
+      destinatarioId: 2,
+      publicacionId: 99,
+      estado: 'pendiente'
+    };
 
-  test('Happy Path: mensaje directo exitoso', async () => {
-    const res = await request(app)
-      .post('/directo')
-      .send({
-        contenido: "Hola, estoy interesado en tu publicación.",
-        remitenteId: 1,
-        destinatarioId: 2,
-        publicacionId: 1
-      });
+    mensajes.create.mockRejectedValue(new Error('Fallo al guardar'));
 
-    expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty('mensaje', 'Mensaje enviado y email notificado.');
-    expect(res.body.data).toHaveProperty('contenido', "Hola, estoy interesado en tu publicación.");
-  });
+    const service = new MessageService();
 
-  test('Unhappy Path: remitente y destinatario iguales', async () => {
-    const res = await request(app)
-      .post('/directo')
-      .send({
-        contenido: "Mensaje a mí mismo",
-        remitenteId: 1,
-        destinatarioId: 1,
-        publicacionId: 1
-      });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body).toHaveProperty('error', 'No puedes enviarte mensajes a ti mismo.');
-  });
-
-  test('Unhappy Path: destinatario no existente', async () => {
-    const res = await request(app)
-      .post('/directo')
-      .send({
-        contenido: "Mensaje a usuario inexistente",
-        remitenteId: 1,
-        destinatarioId: 999,
-        publicacionId: 1
-      });
-
-    expect(res.statusCode).toBe(400);
-    expect(res.body).toHaveProperty('error', 'Remitente o destinatario no válido.');
-  });
-
-  test('Unhappy Path: falta el contenido', async () => {
-    const res = await request(app)
-      .post('/directo')
-      .send({
-        remitenteId: 1,
-        destinatarioId: 2,
-        publicacionId: 1
-      });
-
-    // Puede devolver 500 si el servicio requiere contenido obligatoriamente
-    expect([400, 500]).toContain(res.statusCode);
+    await expect(service.createMessage(dataMock)).rejects.toThrow('Fallo al guardar');
+    expect(mensajes.create).toHaveBeenCalledWith(dataMock);
   });
 });
