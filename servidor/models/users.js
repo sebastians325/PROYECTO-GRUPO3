@@ -53,9 +53,9 @@ module.exports = (sequelize, DataTypes) => {
 
     usuarios.hasMany(models.postulaciones, {
       foreignKey: 'usuarioId',
-      as: 'postulaciones'
+      as: 'postulaciones' 
     });
-
+    
     usuarios.hasMany(models.mensajes, {
       foreignKey: 'remitenteId',
       as: 'mensajesEnviados'
@@ -64,10 +64,6 @@ module.exports = (sequelize, DataTypes) => {
     usuarios.hasMany(models.mensajes, {
       foreignKey: 'destinatarioId',
       as: 'mensajesRecibidos'
-    });
-    usuarios.hasMany(models.Review, {
-      as: 'reviews',
-      foreignKey: 'usuarioId'
     });
   };
 
