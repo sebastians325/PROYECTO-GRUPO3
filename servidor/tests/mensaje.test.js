@@ -42,7 +42,7 @@ describe('POST /directo - Comunicación directa entre usuarios', () => {
     await db.sequelize.close();
   });
 
-  test('✅ Happy Path: mensaje directo exitoso', async () => {
+  test('Happy Path: mensaje directo exitoso', async () => {
     const res = await request(app)
       .post('/directo')
       .send({
@@ -57,7 +57,7 @@ describe('POST /directo - Comunicación directa entre usuarios', () => {
     expect(res.body.data).toHaveProperty('contenido', "Hola, estoy interesado en tu publicación.");
   });
 
-  test('❌ Unhappy Path: remitente y destinatario iguales', async () => {
+  test('Unhappy Path: remitente y destinatario iguales', async () => {
     const res = await request(app)
       .post('/directo')
       .send({
@@ -71,7 +71,7 @@ describe('POST /directo - Comunicación directa entre usuarios', () => {
     expect(res.body).toHaveProperty('error', 'No puedes enviarte mensajes a ti mismo.');
   });
 
-  test('❌ Unhappy Path: destinatario no existente', async () => {
+  test('Unhappy Path: destinatario no existente', async () => {
     const res = await request(app)
       .post('/directo')
       .send({
@@ -85,7 +85,7 @@ describe('POST /directo - Comunicación directa entre usuarios', () => {
     expect(res.body).toHaveProperty('error', 'Remitente o destinatario no válido.');
   });
 
-  test('❌ Unhappy Path: falta el contenido', async () => {
+  test('Unhappy Path: falta el contenido', async () => {
     const res = await request(app)
       .post('/directo')
       .send({
