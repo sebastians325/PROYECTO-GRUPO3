@@ -1,0 +1,214 @@
+.chatbot-toggler {
+  position: fixed; /* Fijo en la pantalla */
+  bottom: 30px;    /* Distancia desde abajo */
+  right: 30px;     /* Distancia desde la derecha */
+  /* Color naranja principal, similar a la imagen de referencia del chatbot */
+  background-color: #FF6F00; /* Un naranja vibrante, puedes ajustarlo */
+  color: white;
+  width: 60px;     /* Ancho de la burbuja */
+  height: 60px;    /* Alto de la burbuja */
+  border-radius: 50%; /* Para hacerlo circular */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem; /* Tamaño del icono FaCommentDots o FaTimes */
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Sombra más pronunciada */
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+  z-index: 1050; /* Asegura que esté por encima de otros elementos */
+}
+
+.chatbot-toggler:hover {
+  transform: scale(1.1); /* Efecto de agrandamiento al pasar el cursor */
+  background-color: #FF8F00; /* Un naranja un poco más claro al hacer hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Tooltip o mensaje de ayuda para el botón del chatbot */
+.chatbot-tooltip-text {
+  position: absolute;
+  /* Se posiciona a la izquierda del botón toggler */
+  bottom: 50%; 
+  right: calc(100% + 10px); /* 10px de espacio entre el tooltip y el botón */
+  transform: translateY(50%); /* Centra verticalmente el tooltip con el botón */
+  background-color: #FFFFFF; /* Fondo blanco como en la imagen de referencia */
+  color: #333333; /* Texto oscuro */
+  padding: 8px 15px;
+  border-radius: 8px; /* Bordes redondeados */
+  font-size: 0.9rem;
+  white-space: nowrap; 
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15); /* Sombra sutil para el tooltip */
+  opacity: 0; 
+  visibility: hidden;
+  transition: opacity 0.25s ease-in-out, visibility 0.25s ease-in-out;
+  pointer-events: none; 
+  z-index: 1051; /* Por encima del toggler para que no se corte */
+}
+
+.chatbot-toggler:hover .chatbot-tooltip-text {
+  opacity: 1; 
+  visibility: visible;
+  transition-delay: 0.1s; /* Pequeño retraso antes de mostrar */
+}
+
+/* Ventana del Chat */
+.chatbot-window {
+  position: fixed;
+  bottom: 105px; /* Distancia desde abajo, encima del botón toggler + espacio */
+  right: 30px;
+  width: 370px; /* Ancho de la ventana del chat */
+  max-height: calc(100vh - 120px); /* Altura máxima, dejando espacio */
+  min-height: 350px; /* Altura mínima */
+  background-color: #FFFFFF;
+  border-radius: 12px; /* Bordes redondeados para la ventana */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  display: flex;
+  flex-direction: column;
+  z-index: 1049; 
+  overflow: hidden; 
+  animation: openChatWindow 0.3s ease-out; 
+}
+
+@keyframes openChatWindow {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Cabecera de la Ventana del Chat */
+.chatbot-header {
+  /* Usamos un color sólido que combine con el gradiente de la página */
+  background-color: #FF8E53; /* Naranja medio, del gradiente de tu página */
+  color: white;
+  padding: 15px 20px; 
+  font-weight: 600;
+  font-size: 1.05rem; /* Ligeramente más pequeño */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Los border-radius superiores ya no son necesarios si .chatbot-window tiene overflow:hidden */
+}
+
+.chatbot-close-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0; /* Ajusta si es necesario para alinear el icono */
+  line-height: 1; 
+}
+.chatbot-close-btn:hover {
+  color: #FFFFFF;
+}
+
+/* Cuerpo del Chat (donde van los mensajes) */
+.chatbot-body {
+  flex-grow: 1; 
+  padding: 15px; /* Padding general para los mensajes */
+  overflow-y: auto; 
+  background-color: #F4F7F9; /* Un gris muy claro para el fondo de los mensajes */
+  display: flex;
+  flex-direction: column; 
+}
+
+/* Estilos para el scrollbar del chat-body (WebKit) */
+.chatbot-body::-webkit-scrollbar {
+  width: 7px;
+}
+.chatbot-body::-webkit-scrollbar-track {
+  background: #EAEAEA;
+  border-radius: 10px;
+}
+.chatbot-body::-webkit-scrollbar-thumb {
+  background: #FFB74D; /* Naranja medio para el scrollbar */
+  border-radius: 10px;
+}
+.chatbot-body::-webkit-scrollbar-thumb:hover {
+  background: #FF9800; /* Naranja más oscuro */
+}
+
+.chat-message {
+  margin-bottom: 10px; /* Espacio entre mensajes */
+  max-width: 85%; 
+  word-wrap: break-word; 
+  display: flex; 
+}
+
+.chat-message p {
+  padding: 10px 15px; 
+  border-radius: 18px; 
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  box-shadow: 0 1px 1.5px rgba(0,0,0,0.07);
+}
+
+/* Mensajes del bot (alineados a la izquierda) */
+.chat-message.bot {
+  justify-content: flex-start; 
+}
+.chat-message.bot p {
+  background-color: #E9ECEF; /* Gris claro para mensajes del bot */
+  color: #343A40; 
+  border-bottom-left-radius: 4px; 
+}
+
+/* Mensajes del usuario (alineados a la derecha) */
+.chat-message.user {
+  justify-content: flex-end; 
+}
+.chat-message.user p {
+  background-color: #FF8E53; /* Naranja medio para mensajes del usuario */
+  color: white;
+  border-bottom-right-radius: 4px; 
+}
+
+/* Pie del Chat (input y botón de enviar) */
+.chatbot-footer {
+  display: flex;
+  align-items: center; 
+  padding: 10px 15px;
+  border-top: 1px solid #DADEE2; 
+  background-color: #FFFFFF;
+}
+
+.chatbot-footer input[type="text"] {
+  flex-grow: 1; 
+  border: 1px solid #D1D9E1; /* Borde más definido */
+  border-radius: 20px; 
+  padding: 10px 18px; 
+  font-size: 0.9rem; /* Ligeramente más pequeño */
+  outline: none;
+  margin-right: 10px; 
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.chatbot-footer input[type="text"]:focus {
+  border-color: #FF8E53;
+  box-shadow: 0 0 0 2px rgba(255, 142, 83, 0.2); /* Sombra de foco más sutil */
+}
+
+.chatbot-footer button[type="submit"] {
+  background-color: #FF6B6B; /* Rojo/Coral para el botón de enviar */
+  color: white;
+  border: none;
+  border-radius: 50%; 
+  width: 40px; /* Tamaño ajustado */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem; 
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.chatbot-footer button[type="submit"]:hover {
+  background-color: #E53935; 
+  transform: scale(1.05); /* Ligero agrandamiento */
+}

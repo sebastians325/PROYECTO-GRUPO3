@@ -21,6 +21,7 @@ import CrearMensaje from './pages/mensaje/CrearMensaje';
 import CrearMensajeF from './pages/mensaje/CrearMensajeF';
 import VerMensaje from './pages/mensaje/VerMensaje';
 import VerMensajeFree from './pages/mensaje/VerMensajesFreelancer';
+import Chatbot from './ComponentesGeneral/chatbot';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path="/mensajes/verF/:publicacionId" element={<VerMensajeFree />} />
         </Routes>
       </main>
+      <Chatbot /> {/* <-- AÑADE EL CHATBOT AQUÍ */}
       <Pie /> 
     </div>
   );
