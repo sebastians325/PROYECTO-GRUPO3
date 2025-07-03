@@ -66,6 +66,13 @@ function DashboardFreelancer() {
               <h3>Mensajes</h3>
               <p>Explora todas las oportunidades y postúlate a los proyectos que te interesen.</p>
             </Link>
+            <Link
+              to={`/freelancers/${freelancer.id}/historial`}
+              className="action-card prominent-action-card"
+            >
+              <h3>Historial</h3>
+              <p>Consulta los trabajos que realizaste y sus calificaciones.</p>
+            </Link>
           </div>
         </section>
         

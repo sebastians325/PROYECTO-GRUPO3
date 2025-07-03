@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         publicaciones.hasMany(models.postulaciones, {
             foreignKey: "publicacionId"
         });
+        publicaciones.hasOne(models.Review, {
+        foreignKey: 'publicacionId', 
+        as: 'review' 
+    });
     };
 
     return publicaciones;

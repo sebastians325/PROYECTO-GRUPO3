@@ -22,6 +22,7 @@ import CrearMensajeF from './pages/mensaje/CrearMensajeF';
 import VerMensaje from './pages/mensaje/VerMensaje';
 import VerMensajeFree from './pages/mensaje/VerMensajesFreelancer';
 import Chatbot from './ComponentesGeneral/chatbot';
+import HistorialTrabajos from './pages/Publicaciones/HistorialTrabajos';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
           <Route path="/mensajes/crearF/:publicacionId" element={<CrearMensajeF />} />
           <Route path="/mensajes/ver/:publicacionId" element={<VerMensaje />} />
           <Route path="/mensajes/verF/:publicacionId" element={<VerMensajeFree />} />
+          <Route path="/freelancers/:freelancerId/historial" element={<HistorialTrabajos />} />
         </Routes>
       </main>
       <Chatbot /> {/* <-- AÑADE EL CHATBOT AQUÍ */}

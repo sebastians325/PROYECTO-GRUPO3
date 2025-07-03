@@ -1,0 +1,59 @@
+.historial-container {
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #fff0ec, #ffe3d7);
+  min-height: 100vh;
+  color: #333;
+}
+
+.historial-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #d32f2f;
+  margin-bottom: 30px;
+}
+
+.historial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.historial-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.historial-card:hover {
+  transform: translateY(-5px);
+}
+
+.descripcion {
+  font-style: italic;
+  color: #666;
+}
+
+.estrellas {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #ffb400;
+}
+
+.estrella {
+  opacity: 0.3;
+}
+
+.estrella.llena {
+  opacity: 1;
+}
+
+.cargando, .error, .vacio {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 50px;
+  color: #444;
+}
