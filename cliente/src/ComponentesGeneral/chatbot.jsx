@@ -76,8 +76,14 @@ function Chatbot() {
     setIsLoading(true);
 
     try {
-      const API_KEY = ''; // <-- REEMPLAZA ESTO
+      // Cambiar esta línea
+      const API_KEY = process.env.REACT_APP_API_KEY;
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+      
+      // Agregar validación
+      if (!API_KEY) {
+        throw new Error("API key no configurada. Verifica tu archivo .env");
+      }
       
       const requestBody = {
         contents: newMessages.map(msg => ({
@@ -87,9 +93,8 @@ function Chatbot() {
         system_instruction: {
           parts: [{ text: SYSTEM_INSTRUCTION }]
         },
-        // --- CONFIGURACIÓN DE CREATIVIDAD CONTROLADA ---
         generationConfig: {
-          temperature: 0.4 // Un buen balance para ser conversacional pero no inventar cosas.
+          temperature: 0.4
         }
       };
 
