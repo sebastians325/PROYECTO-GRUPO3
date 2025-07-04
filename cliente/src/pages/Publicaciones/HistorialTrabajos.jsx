@@ -47,7 +47,7 @@ function HistorialTrabajos() {
             <h3>{item.titulo}</h3>
             <p className="descripcion">{item.descripcion}</p>
             <p><strong>Pago:</strong> S/ {item.pago}</p>
-            <p><strong>Cliente:</strong> {item.cliente ? `${item.cliente.nombre} ${item.cliente.apellido}` : 'Desconocido'}</p>
+            <p><strong>Cliente:</strong> {item.cliente || 'Desconocido'}</p>
             <p><strong>Comentario:</strong> {item.comentario || 'Sin comentarios'}</p>
             <Estrellas calificacion={item.calificacion || 0} />
           </div>
