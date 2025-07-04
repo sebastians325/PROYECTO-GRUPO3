@@ -1,15 +1,75 @@
+//routes/mensajes.js
 const express = require('express');
 const router = express.Router();
-const { usuarios, publicaciones, postulaciones, mensajes } = require('../models');
- 
-const MessageService = require('../services/MessageService');
-const EmailSender = require('../services/EmailSender');
-const EmailNotificationMessageService = require('../decorators/EmailNotificationMessageService');
- 
-const baseService = new MessageService();
-const emailSender = new EmailSender();
-const decoratedService = new EmailNotificationMessageService(baseService, emailSender, usuarios);
+const { mensajes, publicaciones, usuarios, postulaciones, sequelize } = require('../models');
 
+// Cliente inicia conversación (solo si freelancer fue aceptado y no hay conversación previa)
+router.post('/', async (req, res) => {
+  const { contenido, publicacionId, remitenteId, destinatarioId } = req.body;
+
+  try {
+    const cliente = await usuarios.findByPk(remitenteId);
+    if (!cliente || cliente.role !== 'cliente') {
+      return res.status(403).json({ error: 'Solo clientes pueden iniciar conversación.' });
+    }
+
+    const publicacion = await publicaciones.findByPk(publicacionId);
+    if (!publicacion) {
+      return res.status(404).json({ error: 'Publicación no encontrada.' });
+    }
+
+    if (publicacion.usuarioId !== remitenteId) {
+      return res.status(403).json({ error: 'No puedes iniciar mensajes en publicaciones que no son tuyas.' });
+    }
+
+    const freelancer = await usuarios.findByPk(destinatarioId);
+    if (!freelancer || freelancer.role !== 'freelancer') {
+      return res.status(400).json({ error: 'El destinatario debe ser un freelancer.' });
+    }
+
+    const postulacionAceptada = await postulaciones.findOne({
+      where: {
+        publicacionId,
+        usuarioId: destinatarioId,
+        estado: 'aceptado',
+      },
+    });
+
+    if (!postulacionAceptada) {
+      return res.status(400).json({ error: 'Solo puedes iniciar mensajes con freelancers aceptados en la publicación.' });
+    }
+
+    // Verificar si ya existe conversación (sin importar el orden remitente/destinatario)
+    const conversacionExistente = await mensajes.findOne({
+      where: {
+        publicacionId,
+        [sequelize.Op.or]: [
+          { remitenteId, destinatarioId },
+          { remitenteId: destinatarioId, destinatarioId: remitenteId }
+        ]
+      }
+    });
+
+    if (conversacionExistente) {
+      return res.status(400).json({ error: 'Ya existe una conversación con este freelancer para esta publicación.' });
+    }
+
+    const mensaje = await mensajes.create({
+      contenido,
+      publicacionId,
+      remitenteId,
+      destinatarioId,
+      estado: 'pendiente',
+    });
+
+    res.status(201).json(mensaje);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al enviar mensaje.', details: err.message });
+  }
+});
+
+// Obtener mensajes (historial) para publicación - orden cronológico
 router.get('/publicacion/:publicacionId', async (req, res) => {
   const { publicacionId } = req.params;
   const { usuarioId } = req.query; // id del usuario que solicita
@@ -65,6 +125,55 @@ router.get('/publicacion/:publicacionId', async (req, res) => {
   }
 });
 
+// Freelancer o cliente responde en conversación existente
+router.post('/responder', async (req, res) => {
+  const { contenido, publicacionId, remitenteId, destinatarioId } = req.body;
+
+  try {
+    const remitente = await usuarios.findByPk(remitenteId);
+    const destinatario = await usuarios.findByPk(destinatarioId);
+
+    if (!remitente || !destinatario) {
+      return res.status(400).json({ error: 'Remitente o destinatario no válido.' });
+    }
+
+    // Solo roles permitidos en el intercambio
+    if (
+      !(remitente.role === 'cliente' && destinatario.role === 'freelancer') &&
+      !(remitente.role === 'freelancer' && destinatario.role === 'cliente')
+    ) {
+      return res.status(403).json({ error: 'Roles no permitidos para enviar mensajes.' });
+    }
+
+    // Validar que existe conversación previa (cualquiera de los dos pudo iniciar)
+    const existeConversacion = await mensajes.findOne({
+      where: {
+        publicacionId,
+        [sequelize.Op.or]: [
+          { remitenteId, destinatarioId },
+          { remitenteId: destinatarioId, destinatarioId: remitenteId }
+        ]
+      }
+    });
+
+    if (!existeConversacion) {
+      return res.status(403).json({ error: 'No puedes responder sin conversación previa.' });
+    }
+
+    const nuevoMensaje = await mensajes.create({
+      contenido,
+      publicacionId,
+      remitenteId,
+      destinatarioId,
+      estado: 'pendiente',
+    });
+
+    res.status(201).json({ mensaje: 'Respuesta enviada', data: nuevoMensaje });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al responder mensaje.', details: err.message });
+  }
+});
 
 // Cliente ve sus publicaciones con botones nuevoMensaje y verMensajes
 router.get('/cliente/:clienteId/publicaciones', async (req, res) => {
@@ -138,34 +247,50 @@ router.get('/publicacion/:publicacionId/freelancer', async (req, res) => {
   }
 });
 
-// Comunicación directa entre usuarios 
+// Obtener cliente dueño de la publicación
+router.get('/publicacion/:publicacionId/cliente', async (req, res) => {
+  const { publicacionId } = req.params;
+  try {
+    const publicacion = await publicaciones.findByPk(publicacionId, {
+      include: [{ model: usuarios, attributes: ['id', 'nombre', 'apellido', 'role'] }],
+    });
+    if (!publicacion) {
+      return res.status(404).json({ error: 'Publicación no encontrada.' });
+    }
+    res.json(publicacion.usuario);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener cliente de la publicación.', details: err.message });
+  }
+});
+// Comunicación directa entre usuarios (sin publicación asociada)
 router.post('/directo', async (req, res) => {
-  const { contenido, remitenteId, destinatarioId, publicacionId } = req.body;
- 
+  const { contenido, remitenteId, destinatarioId,publicacionId } = req.body;
+
   try {
     const remitente = await usuarios.findByPk(remitenteId);
     const destinatario = await usuarios.findByPk(destinatarioId);
- 
+
     if (!remitente || !destinatario) {
       return res.status(400).json({ error: 'Remitente o destinatario no válido.' });
     }
- 
+
+    // Validar roles si quieres limitar (opcional)
     if (remitenteId === destinatarioId) {
       return res.status(400).json({ error: 'No puedes enviarte mensajes a ti mismo.' });
     }
- 
-    const mensaje = await decoratedService.createMessage({
+
+    const mensaje = await mensajes.create({
       contenido,
       remitenteId,
       destinatarioId,
-      publicacionId,
+      publicacionId, 
       estado: 'pendiente',
     });
- 
-    res.status(201).json({ mensaje: 'Mensaje enviado y email notificado.', data: mensaje });
+
+    res.status(201).json({ mensaje: 'Mensaje enviado directamente', data: mensaje });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error al enviar mensaje.', details: err.message });
+    res.status(500).json({ error: 'Error al enviar mensaje directo.', details: err.message });
   }
 });
 
