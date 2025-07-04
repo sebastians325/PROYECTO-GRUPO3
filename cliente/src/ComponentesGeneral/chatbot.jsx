@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './chatbot.css';
 import { FaCommentDots, FaTimes, FaPaperPlane } from 'react-icons/fa';
+import { sendChatQuery } from '../services/chatbotService';
 
-// --- NUEVO SYSTEM_INSTRUCTION CON LIBERTAD SUPERVISADA ---
+
 const SYSTEM_INSTRUCTION = `**Meta-Regla: Eres 'LaboraPe Bot', un asistente virtual amigable, servicial y conversacional. Tu objetivo es guiar a los usuarios de forma clara y natural. Para las preguntas específicas de la plataforma, basa tus respuestas en los datos clave proporcionados a continuación.**
 
 **1. Directiva Principal: Identificación de Rol**
@@ -76,15 +77,6 @@ function Chatbot() {
     setIsLoading(true);
 
     try {
-      // Cambiar esta línea
-      const API_KEY = process.env.REACT_APP_API_KEY;
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
-      
-      // Agregar validación
-      if (!API_KEY) {
-        throw new Error("API key no configurada. Verifica tu archivo .env");
-      }
-      
       const requestBody = {
         contents: newMessages.map(msg => ({
           role: msg.sender === 'bot' ? 'model' : 'user',
@@ -92,24 +84,10 @@ function Chatbot() {
         })),
         system_instruction: {
           parts: [{ text: SYSTEM_INSTRUCTION }]
-        },
-        generationConfig: {
-          temperature: 0.4
         }
       };
-
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error.message || "Hubo un problema con la API de IA.");
-      }
-
-      const data = await response.json();
+      
+      const data = await sendChatQuery(requestBody);
       
       if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
         const botResponseText = data.candidates[0].content.parts[0].text;
@@ -120,7 +98,7 @@ function Chatbot() {
       }
 
     } catch (error) {
-      console.error("Error al llamar a la API de Google AI:", error);
+      console.error("Error en la comunicación con el backend:", error);
       const errorMessage = { id: Date.now() + 1, text: `Lo siento, ocurrió un error: ${error.message}`, sender: 'bot' };
       setMessages(prevMessages => [...prevMessages, errorMessage]);
     } finally {
@@ -129,7 +107,6 @@ function Chatbot() {
   };
 
   return (
-    // ... (todo tu JSX se mantiene exactamente igual que en la respuesta anterior)
     <>
       <div className="chatbot-toggler" onClick={toggleChat} title="¿Necesitas ayuda?">
         {isOpen ? <FaTimes /> : <FaCommentDots />}

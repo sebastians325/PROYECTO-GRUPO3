@@ -12,9 +12,7 @@ function PublicacionesCliente({
   // Se gestionan los estados iniciales antes de renderizar la lista principal.
   // Si 'loading' es true, se informa al usuario que los datos están en proceso de carga.
   if (loading) return <p className="loading-message">Cargando publicaciones...</p>;
-  // Si la prop 'error' contiene un mensaje, se muestra al usuario.
   if (error) return <p className="error-message">{error}</p>;
-  // Si no hay publicaciones para mostrar (y no está cargando ni hay error),
   // se presenta un mensaje indicado.
   if (publicaciones.length === 0) return <p className="no-publications-message">No has creado publicaciones todavía.</p>;
 

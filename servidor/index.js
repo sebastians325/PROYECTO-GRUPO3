@@ -31,12 +31,16 @@ app.use("/publicaciones", publicacionesRouter1);
 const freelancerRoutes = require('./routes/freelancer.routes');
 app.use('/api/freelancers', freelancerRoutes);
 
-  if (process.env.NODE_ENV !== 'test') {
-    db.sequelize.sync().then(() => {
-      app.listen(3001, () => {
-        console.log("Servidor corriendo en puerto 3001");
-      });
-    });
-  }
+const chatbotRoutes = require('./routes/chatbot.routes');
+app.use('/api/chatbot', chatbotRoutes);
 
-module.exports = app; // ⬅️ Agrega esta línea
+
+ if (process.env.NODE_ENV !== 'test') {
+   db.sequelize.sync().then(() => {
+     app.listen(3001, () => {
+       console.log("Servidor corriendo en puerto 3001");
+     });
+   });
+ }
+
+module.exports = app;
