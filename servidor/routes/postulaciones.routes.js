@@ -1,4 +1,4 @@
-// ✅ servidor/routes/postulaciones.routes.js
+// servidor/routes/postulaciones.routes.js
 const router = require('express').Router();
 const PostulacionesController = require('../controllers/postulaciones.controller');
 const { validatePostulacion } = require('../middleware/validators/postulacion.validator');
@@ -15,14 +15,14 @@ router.put('/:id/aceptar',
     PostulacionesController.aceptarPostulante.bind(PostulacionesController)
 );
 
-// ✅ Ruta para postular con CV subido a S3
+// Ruta para postular con CV subido a S3
 router.post(
     '/postular-con-cv',
     uploadCV.single('cv'),
     PostulacionesController.postularConCV.bind(PostulacionesController)
 );
 
-// ✅ Ruta para obtener link firmado
+// Ruta para obtener link firmado
 router.get('/ver-cv/:filename', async (req, res) => {
   try {
     const url = await getCVSignedUrl(req.params.filename);
