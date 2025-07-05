@@ -10,7 +10,7 @@ const CrearMensajeDirecto = () => {
   const [contenido, setContenido] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
-  const [postulantes, setPostulantes] = useState([]);
+  const [postulantes, setPostulantes] = useState([]); // ahora sí lo usaremos
   const [destinatarioId, setDestinatarioId] = useState('');
 
   const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -58,8 +58,22 @@ const CrearMensajeDirecto = () => {
   return (
     <div style={{ padding: '20px', maxWidth: 600, margin: 'auto' }}>
       <h2>Enviar Mensaje Directo ({remitenteId} → {destinatarioId || '?'})</h2>
+
       {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {postulantes.length > 0 && (
+        <div style={{ marginBottom: '15px' }}>
+          <h4>Freelancers aceptados:</h4>
+          <ul>
+            {postulantes.map((p) => (
+              <li key={p.usuarioId}>
+                ID: {p.usuarioId} {p.usuario?.nombre ? `- ${p.usuario.nombre}` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <textarea
