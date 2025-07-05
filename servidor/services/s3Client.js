@@ -1,4 +1,4 @@
-// 📁 servidor/services/s3Client.js
+//servidor/services/s3Client.js
 const { S3Client } = require("@aws-sdk/client-s3");
 
 let instance = null;
