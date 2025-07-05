@@ -1,4 +1,4 @@
-// 📁 servidor/services/s3Service.js
+// servidor/services/s3Service.js
 const { GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const multer = require('multer');
