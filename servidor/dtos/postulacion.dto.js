@@ -9,7 +9,7 @@ class PostulacionDTO {
             usuarioId: postulacion.usuarioId,
             publicacionId: postulacion.publicacionId,
             createdAt: postulacion.createdAt,
-            cvUrl: postulacion.cvUrl // ✅ AGREGA ESTA LÍNEA
+            cvUrl: postulacion.cvUrl //AGREGA ESTA LÍNEA
         };
 
         if (postulacion.freelancer) {
