@@ -10,7 +10,7 @@ const CrearMensajeDirecto = () => {
   const [contenido, setContenido] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
-  const [postulantes, setPostulantes] = useState([]); // ahora sí lo usaremos
+  const [postulantes, setPostulantes] = useState([]); 
   const [destinatarioId, setDestinatarioId] = useState('');
 
   const storedUser = JSON.parse(localStorage.getItem('user'));
